@@ -1,0 +1,13 @@
+
+<form action="#" ng-submit="save()">
+	<div ng-class="{'has-error': error != undefined && error.indexOf('name') != -1} " class="input-group">
+		<span class="input-group-addon">name</span> <input type="text"
+			placeholder="name" ng-model="data.name" class="form-control">
+	</div>
+	<div ng-class="{'has-error': error != undefined && error.indexOf('content') != -1} " class="input-group">
+		<span class="input-group-addon">content</span>
+		<textarea placeholder="content" ng-model="data.content"
+			class="form-control"></textarea>
+	</div>
+	<input type="submit">
+</form>
