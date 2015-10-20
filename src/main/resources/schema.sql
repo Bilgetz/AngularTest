@@ -14,7 +14,7 @@ CREATE TABLE post (
 CREATE TABLE comment (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(128) NOT NULL,
-    content VARCHAR(128) NOT NULL,
+    content VARCHAR(2048) NOT NULL,
     idpost BIGINT NOT NULL,
     CONSTRAINT commentpost
     FOREIGN KEY (idpost )
