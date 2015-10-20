@@ -33,8 +33,8 @@
 	    	
 	    	<input ng-show="selectedField.type != undefined" type="submit" value="add">
     	</form>
-		<ul  class="list-group">
-			<li  ng-repeat="criteria in criterias"  class="list-group-item">
+		<ul  class="list-group row">
+			<li  ng-repeat="criteria in criterias"  class="list-group-item col-md-4">
 				{{criteria.field.value}} 
 				{{criteria.operation.value}} 
 				{{criteria.value.value != undefined ? criteria.value.value : criteria.value.name != undefined ? criteria.value.name : ''}}

@@ -42,6 +42,6 @@ angularApp.run(['$rootScope', function($rootScope) {
 angularApp.config(['$routeProvider', function($routeProvider) {
 	$routeProvider
 		.when('/',{templateUrl: 'partials', controller : 'PostsCtrl'})
-		.when('/comments/:id',{templateUrl: 'partials/comments', controller : 'CommentsCtrl'})
+		.when('/comments/:id',{templateUrl: 'directives/comments.html', controller : 'CommentsCtrl'})
 		.otherwise({redirectTo: '/'});
 }]);

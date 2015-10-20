@@ -35,9 +35,9 @@ public class IndexController {
 	 *
 	 * @return the string
 	 */
-	@RequestMapping(value = "/partials/comments")
-	public String partialsComments() {
-		return "partials/comments";
-	}
+	// @RequestMapping(value = "/partials/comments")
+	// public String partialsComments() {
+	// return "partials/comments";
+	// }
 
 }
