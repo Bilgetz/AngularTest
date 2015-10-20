@@ -2,17 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <div ng-hide="loading">
-	<div class="row">
-		<div class="col-md-4">
-			<uib-pagination total-items="page.totalElements" max-size="5"
-				class="pagination-sm" items-per-page="page.size"
-				boundary-links="true" rotate="false" ng-change="pageChanged()"
-				ng-model="page.number"></uib-pagination>
-		</div>
-		<div class="col-md-1"><label>Size:</label>
-			<input type="number" class="form-control" ng-model="page.size" ng-change="pageChanged()">
-		</div>
-	</div>
+	<ng-paging page="page" page-changed="pageChanged()"  ></ng-paging>
 	<div>
 		<form  ng-submit="addCriteria()">
 			<%-- properties --%>

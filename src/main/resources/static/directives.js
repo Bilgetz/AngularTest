@@ -49,3 +49,14 @@ angularApp.directive('ngCommentEdit', function() {
 	}
 });
 
+angularApp.directive('ngPaging', function() {
+	return {
+		restrict : 'E',
+		templateUrl: 'directives/paging.html',
+		scope : {
+			page :'=',
+			pageChanged : '&'
+		}
+	}
+});
+
