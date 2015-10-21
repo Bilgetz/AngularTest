@@ -1,5 +1,5 @@
 package com.example.enums;
 
-public enum Etat {
+public enum State {
 	VALID, OBSOLETE
 }

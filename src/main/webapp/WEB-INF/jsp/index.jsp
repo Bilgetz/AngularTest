@@ -17,7 +17,23 @@
 </head>
 <body ng-app="demoApp">
 <!-- http://www.grafikart.fr/formations/angularjs -->
-	<div ng-show="loading">Chargements....</div>
+	<header class="navbar navbar-default navbar-fixed-top navbar-inner">
+	<div class="container">
+	<div class="nav navbar-nav navbar-right btn-group" uib-dropdown  on-toggle="toggled(open)">
+      <button id="split-button" type="button" class="btn btn-danger">{{locale}}</button>
+      <button type="button" class="btn btn-danger" uib-dropdown-toggle>
+        <span class="caret"></span>
+        <span class="sr-only">Split button!</span>
+      </button>
+      <ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
+        <li role="menuitem" ng-repeat="choice in locales" ng-click="setLocale(choice)"><a href>{{choice}}</a></li>
+      </ul>
+    </div>
+	</div>
+	</header>
+	<div style="height: 50px"> </div>
+
+	<div ng-show="loading">{{ 'message.loading' | translate }}</div>
 	<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" dismiss-on-timeout="5000" >
 	<div ng-bind-html="alert.msg"></div>	
 	</uib-alert>
@@ -29,6 +45,8 @@
 <script type="text/javascript" src="lib/underscore.1.8.3-min.js"></script>
 <script type="text/javascript" src="lib/ui-bootstrap-tpls-0.14.2.min.js"></script>
 <script type="text/javascript" src="lib/angular-sanitize.min.js"></script>
+<script type="text/javascript" src="lib/angular-translate.min.js"></script>
+<script type="text/javascript" src="lib/angular-translate-loader-url.min.js"></script>
 
 <script type="text/javascript" src="app.js"></script>
 <script type="text/javascript" src="services.js"></script>

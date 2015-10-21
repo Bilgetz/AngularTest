@@ -2,10 +2,40 @@
  * 
  */
 
-var angularApp = angular.module('demoApp',['ngRoute', 'ngResource','spring-data-rest','ui.bootstrap','ngSanitize']); 
-angularApp.run(['$rootScope', function($rootScope) {
+var angularApp = angular.module('demoApp',['ngRoute', 'ngResource','spring-data-rest','ui.bootstrap','ngSanitize','pascalprecht.translate']); 
+angularApp.run(['$rootScope', 'LocaleFactory','$translate', function($rootScope, localeFactory,$translate) {
 	$rootScope.page = {};
 	$rootScope.alerts = [];
+	$rootScope.locales= [];
+	$rootScope.locale= "";
+	
+
+	
+	localeFactory.find().then(function(locales) {
+		$rootScope.locales = locales;
+	}, function(result) {
+		alert(result);
+	});
+	
+	localeFactory.getCurrent().then(function(current) {
+		$rootScope.locale = current;
+		$translate.use($rootScope.locale);
+	}, function(result) {
+		alert(result);
+	});
+	
+	$rootScope.toggled = function(open) {
+		//alert(open);
+	}
+	$rootScope.setLocale = function (locale) {
+		localeFactory.change(locale).then(function(current) {
+			$rootScope.locale = current;
+			$translate.use($rootScope.locale);
+		}, function(result) {
+			alert(result);
+		});
+	}
+	
 	
 	$rootScope.addAlert = function(alert) {
 		$rootScope.alerts.push(alert);
@@ -39,9 +69,11 @@ angularApp.run(['$rootScope', function($rootScope) {
 	
 }]);
 
-angularApp.config(['$routeProvider', function($routeProvider) {
+angularApp.config(['$routeProvider', '$translateProvider',function($routeProvider, 	$translateProvider) {
 	$routeProvider
 		.when('/',{templateUrl: 'partials', controller : 'PostsCtrl'})
 		.when('/comments/:id',{templateUrl: 'directives/comments.html', controller : 'CommentsCtrl'})
 		.otherwise({redirectTo: '/'});
+	
+	$translateProvider.useUrlLoader('locales/current');
 }]);

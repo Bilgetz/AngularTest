@@ -8,7 +8,7 @@ CREATE TABLE post (
     name VARCHAR(128) NOT NULL,
     content VARCHAR(4096) NOT NULL,
     note INT NOT NULL,
-    etat VARCHAR(32) NOT NULL,
+    state VARCHAR(32) NOT NULL,
     idcategory BIGINT NOT NULL
 );
 

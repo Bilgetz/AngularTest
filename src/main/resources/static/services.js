@@ -147,3 +147,37 @@ function CategoryFactory($http, $q, SpringDataRestAdapter) {
 	}
 	return factory;
 }
+
+angularApp.factory('LocaleFactory', ['$http','$q',LocaleFactory ]);
+
+function LocaleFactory($http, $q, SpringDataRestAdapter) {
+	var factory = {
+			find : function(page, limit, criterias) {
+				var deferred = $q.defer();
+				var httpPromise = $http.get('locales').then(function(response) {
+					deferred.resolve(response.data);
+				}, function() {
+					deferred.reject('error on loading' + response.statusText);
+				});
+				return deferred.promise;
+			},
+			getCurrent : function() {
+				var deferred = $q.defer();
+				var httpPromise = $http.get('locale').then(function(response) {
+					deferred.resolve(response.data);
+				}, function() {
+					deferred.reject('error on loading' + response.statusText);
+				});
+				return deferred.promise;
+			}, change: function (locale) {
+				var deferred = $q.defer();
+				var httpPromise = $http.get('locale?lang='+ locale).then(function(response) {
+					deferred.resolve(response.data);
+				}, function() {
+					deferred.reject('error on loading' + response.statusText);
+				});
+				return deferred.promise;
+			},
+	}
+	return factory;
+}

@@ -15,7 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import com.example.enums.Etat;
+import com.example.enums.State;
 
 import lombok.Data;
 
@@ -49,7 +49,7 @@ public class Post implements Serializable {
 
 	@Enumerated(EnumType.STRING)
 	@Column
-	private Etat etat;
+	private State state;
 
 	/** The category. */
 	@ManyToOne

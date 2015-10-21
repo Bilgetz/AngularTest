@@ -1,8 +1,12 @@
 <h1>{{data.name}}</h1>
-<h6>{{data.category.name}} category,note:{{data.note}} etat:{{data.etat}}</h6>
+<h6>
+{{'entity.post.category' |  translate }}:{{data.category.name}},
+{{'entity.post.note' | translate}}:{{data.note}},
+{{'entity.post.state' | translate}}:{{data.state}}
+</h6>
 
 <p>{{data.content}}</p>
 <p>
 	<a href="#/comments/{{data.id}}">{{data.comments.length}}
-		commentaires</a>
+		{{'message.comments'|translate}}</a>
 </p>
