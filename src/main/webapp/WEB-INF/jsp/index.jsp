@@ -33,11 +33,11 @@
 	</header>
 	<div style="height: 50px"> </div>
 
-	<div ng-show="loading">{{ 'message.loading' | translate }}</div>
+	<div ng-show="loading" class="container" >{{ 'message.loading' | translate }}</div>
 	<uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)" dismiss-on-timeout="5000" >
 	<div ng-bind-html="alert.msg"></div>	
 	</uib-alert>
-	<div ng-view></div>
+	<div ng-view class="container"></div>
 <script type="text/javascript" src="lib/angular.1.4.7.min.js"></script>
 <script type="text/javascript" src="lib/angular-route.min.1.4.7.js"></script>
 <script type="text/javascript" src="lib/angular-resource.1.4.7.min.js"></script>
