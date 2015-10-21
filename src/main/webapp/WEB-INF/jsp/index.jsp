@@ -18,17 +18,29 @@
 <body ng-app="demoApp">
 <!-- http://www.grafikart.fr/formations/angularjs -->
 	<header class="navbar navbar-default navbar-fixed-top navbar-inner">
-	<div class="container">
-	<div class="nav navbar-nav navbar-right btn-group" uib-dropdown  on-toggle="toggled(open)">
-      <button id="split-button" type="button" class="btn btn-danger">{{locale}}</button>
-      <button type="button" class="btn btn-danger" uib-dropdown-toggle>
-        <span class="caret"></span>
-        <span class="sr-only">Split button!</span>
-      </button>
-      <ul class="uib-dropdown-menu" role="menu" aria-labelledby="split-button">
-        <li role="menuitem" ng-repeat="choice in locales" ng-click="setLocale(choice)"><a href>{{choice}}</a></li>
-      </ul>
-    </div>
+	<div class="container-fluid">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="#/">{{'message.home'| translate}}</a>
+	</div>
+
+		<ul class="nav navbar-nav  navbar-right">
+			<li><div class="btn-group" uib-dropdown
+					on-toggle="toggled(open)">
+					<button id="split-button" type="button" class="btn btn-danger">{{locale}}</button>
+					<button type="button" class="btn btn-danger" uib-dropdown-toggle>
+						<span class="caret"></span> <span class="sr-only">Split button!</span>
+					</button>
+					<ul class="uib-dropdown-menu" role="menu"
+						aria-labelledby="split-button">
+						<li role="menuitem" ng-repeat="choice in locales"
+							ng-click="setLocale(choice)"><a href>{{choice}}</a></li>
+					</ul>
+				</div></li>
+		</ul>
+		<ul class="nav navbar-nav  navbar-right " ng-controller="LoginCtrl" >
+			<li ng-hide="authenticated" ><a href="#/login">{{'message.login'| translate}}</a></li>
+			<li ng-show="authenticated" ><a href="" ng-click="logout()">{{'message.logout'| translate}} {{user.name}}</a></li>
+		</ul>
 	</div>
 	</header>
 	<div style="height: 50px"> </div>

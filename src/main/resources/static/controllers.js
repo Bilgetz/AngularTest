@@ -125,3 +125,51 @@ function CommentsCtrl($scope,$rootScope, $PostFactory,$CommentFactory,$routepara
 		
 	}
 }
+
+angularApp.controller('LoginCtrl',['$scope','$rootScope','LoginFactory', '$location' ,LoginCtrl]);
+function LoginCtrl($scope,$rootScope,LoginFactory, $location) {
+	$scope.credentials = {};
+	$scope.user = {};
+	//on tente de recup l'utilisateur, avec du bol, il est deja connecte
+	LoginFactory.get().then(function(user) {
+		if(user.name) {
+			$rootScope.authenticated = true;
+			$scope.user = user;
+		} else {
+			$rootScope.authenticated = false;
+			$scope.user = {};
+		}
+	}, function(error) {
+		 $rootScope.authenticated = false;
+		 $scope.user = {};
+	});
+	$scope.login = function() {
+		LoginFactory.login($scope.credentials).then(function(user) {
+			if(user.name) {
+				$rootScope.authenticated = true;
+				$scope.user = user;
+				$location.path("/");
+			} else {
+				$rootScope.authenticated = false;
+				$scope.user = {};
+			}
+		}, function(errors) {
+			 $rootScope.authenticated = false;
+			 $scope.user = {};
+			var err= $rootScope.generateErrorList(errors);
+			$rootScope.addAlert({type:'danger', msg: err.status });
+		});
+	}
+	$scope.logout = function() {
+		LoginFactory.logout().then(function() {
+			 $rootScope.authenticated = false;
+			 $scope.user = {};
+			 $location.path("/");
+		}, function(errors) {
+			// en faite, on est quand meme deco
+			 $rootScope.authenticated = false;
+			 $scope.user = {};
+		});
+	}
+}
+

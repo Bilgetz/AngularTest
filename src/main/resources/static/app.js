@@ -8,7 +8,7 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate', function($rootScope,
 	$rootScope.alerts = [];
 	$rootScope.locales= [];
 	$rootScope.locale= "";
-	
+	$rootScope.authenticated = false;
 
 	
 	localeFactory.find().then(function(locales) {
@@ -69,11 +69,14 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate', function($rootScope,
 	
 }]);
 
-angularApp.config(['$routeProvider', '$translateProvider',function($routeProvider, 	$translateProvider) {
+angularApp.config(['$routeProvider', '$translateProvider','$httpProvider',function($routeProvider, 	$translateProvider,$httpProvider) {
 	$routeProvider
 		.when('/',{templateUrl: 'partials', controller : 'PostsCtrl'})
 		.when('/comments/:id',{templateUrl: 'directives/comments.html', controller : 'CommentsCtrl'})
+		.when('/login', {templateUrl : 'directives/login.html', controller : 'LoginCtrl'})
 		.otherwise({redirectTo: '/'});
 	
 	$translateProvider.useUrlLoader('locales/current');
+	//for spring security
+	$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 }]);

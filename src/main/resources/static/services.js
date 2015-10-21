@@ -181,3 +181,50 @@ function LocaleFactory($http, $q, SpringDataRestAdapter) {
 	}
 	return factory;
 }
+
+angularApp.factory('LoginFactory', ['$http','$q',LoginFactory ]);
+
+function LoginFactory($http, $q, SpringDataRestAdapter) {
+	var factory = {
+			get: function() {
+				return this.login();
+			},
+			login: function(credentials) {
+				
+				var config = credentials ? { headers  : {authorization : "Basic "
+			        + btoa(credentials.username + ":" + credentials.password)
+				}} : {};
+			    
+				var deferred = $q.defer();
+				var httpPromise = $http.get('user', config).then(function(response) {
+					deferred.resolve(response.data);
+				}, function(response) {
+					var result;
+					if(response.data != undefined && response.data.errors != undefined) {
+						result = response.data.errors;
+					} else  {
+						result = [{property: 'Cannot connect ' , message:  response.statusText }];
+					}
+					deferred.reject(result);
+				});
+				return deferred.promise;
+			},
+			logout: function() {
+				var deferred = $q.defer();
+				$http.post('logout', {}).then(function(response) {
+					deferred.resolve(response);
+				}, function (response) {
+					var result;
+					if(response.data != undefined && response.data.errors != undefined) {
+						result = response.data.errors;
+					} else  {
+						result = [{property: 'Cannot logout ' , message:  response.statusText }];
+					}
+					deferred.reject(result );
+				});
+				return deferred.promise;
+			}
+	};
+	return factory;
+}
+
