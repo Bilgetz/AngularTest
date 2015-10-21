@@ -12,19 +12,19 @@ function PostsCtrl($scope,$rootScope,  $PostFactory, $CategoryFactory) {
 	$scope.criteriaField = [{id: "name", value:"name of post", type: "text"},
 	                        {id: "content", value:"content of post", type: "text"},
 	                        {id: "note", value:"note of post", type: "number"},
+	                        {id: "etat", value:"etat of post", type: "entity"},
 	                        {id: "category", value:"category of post", type: "entity"}];
-	$scope.selectedField= {};
 	$scope.criteriaOperation = [{id: ":", value:"="}, {id: "<", value:"inf"}, {id: ">", value:"sup"}];
-	$scope.selectedOperation= {};
-	$scope.selectedValue = "";
-	$scope.selectedEntity = {};
-	$scope.categories = [];
+	$scope.subResources = { category : [] , etat: []}
 	
 	$CategoryFactory.find().then(function(result) {
-		$scope.categories = result.categories;
+		$scope.subResources.category = result.categories;
 	}, function(msg) {
 		alert(msg);
 	});
+	
+	$scope.subResources.etat = [{id:'VALID', name: 'VALID'}, {id:'OBSOLETE', name: 'OBSOLETE'}];
+	
 	
 	$scope.pageChanged = function() {
 		$PostFactory.find($scope.page.number, $scope.page.size,$scope.criterias).then(function(result) {

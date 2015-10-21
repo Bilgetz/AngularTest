@@ -1,11 +1,16 @@
 package com.example.specification;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import javax.persistence.Entity;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 
 import lombok.AllArgsConstructor;
@@ -15,6 +20,8 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public class EntitySpecification<T> implements Specification<T> {
+
+	private final Logger LOG = LoggerFactory.getLogger(EntitySpecification.class);
 
 	/** The criteria. */
 	private SearchCriteria criteria;
@@ -28,20 +35,42 @@ public class EntitySpecification<T> implements Specification<T> {
 	 */
 	@Override
 	public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+		LOG.debug("EntitySpecification.toPredicate {} {} {}", root, query, builder);
+
+		Predicate result = null;
+
 		if (criteria.getOperation().equalsIgnoreCase(">")) {
-			return builder.greaterThanOrEqualTo(root.<String> get(criteria.getKey()), criteria.getValue().toString());
+			result = builder.greaterThanOrEqualTo(root.<String> get(criteria.getKey()), criteria.getValue().toString());
 		} else if (criteria.getOperation().equalsIgnoreCase("<")) {
-			return builder.lessThanOrEqualTo(root.<String> get(criteria.getKey()), criteria.getValue().toString());
+			result = builder.lessThanOrEqualTo(root.<String> get(criteria.getKey()), criteria.getValue().toString());
 		} else if (criteria.getOperation().equalsIgnoreCase(":")) {
-			if (root.get(criteria.getKey()).getJavaType() == String.class) {
-				return builder.like(root.<String> get(criteria.getKey()), "%" + criteria.getValue() + "%");
-			} else if (root.get(criteria.getKey()).getJavaType().getAnnotation(Entity.class) != null) {
-				return builder.equal(root.get(criteria.getKey()).get("id"), criteria.getValue());
+			Class<? extends Object> javaType = root.get(criteria.getKey()).getJavaType();
+			if (javaType == String.class) {
+				result = builder.like(root.<String> get(criteria.getKey()), "%" + criteria.getValue() + "%");
+			} else if (javaType.getAnnotation(Entity.class) != null) {
+				result = builder.equal(root.get(criteria.getKey()).get("id"), criteria.getValue());
+			} else if (javaType.isEnum()) {
+				try {
+					Method valueOfMethod = javaType.getMethod("valueOf", String.class);
+					Object enumValue = valueOfMethod.invoke(javaType, criteria.getValue());
+					result = builder.equal(root.get(criteria.getKey()), enumValue);
+				} catch (NoSuchMethodException e) {
+					LOG.error("Method not found for Enum", e);
+				} catch (SecurityException e) {
+					LOG.error("security problem for Enum", e);
+				} catch (IllegalAccessException e) {
+					LOG.error("IllegalAccessException problem for Enum", e);
+				} catch (IllegalArgumentException e) {
+					LOG.error("IllegalArgumentException problem for Enum", e);
+				} catch (InvocationTargetException e) {
+					LOG.error("InvocationTargetException problem for Enum", e);
+				}
 			} else {
-				return builder.equal(root.get(criteria.getKey()), criteria.getValue());
+				result = builder.equal(root.get(criteria.getKey()), criteria.getValue());
 			}
 		}
-		return null;
+		LOG.debug("EntitySpecification.toPredicate  result {}", result);
+		return result;
 	}
 
 }

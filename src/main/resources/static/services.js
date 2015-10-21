@@ -20,7 +20,7 @@ function PostFactory($http, $q, SpringDataRestAdapter) {
 			
 			var httpPromise = $http.get(url);
 			SpringDataRestAdapter.process(httpPromise, ['comments','category']).then(function (processedResponse) {
-				var posts = processedResponse._embeddedItems;
+				var posts = processedResponse._embeddedItems != undefined ? processedResponse._embeddedItems : [];
 				processedResponse.page.number++;
 				for (var i = 0, l=posts.length; i < l; i++) {
 					if(posts[i].comments._embeddedItems != undefined) {
