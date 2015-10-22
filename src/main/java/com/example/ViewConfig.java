@@ -29,7 +29,7 @@ public class ViewConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public CustomResourceBundleMessageSource getTessourceBundel() {
+	public CustomResourceBundleMessageSource messageSource() {
 		CustomResourceBundleMessageSource bean = new CustomResourceBundleMessageSource();
 		// #spring.messages.basename=messages
 		bean.setBasename("messages");
