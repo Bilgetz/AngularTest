@@ -16,7 +16,7 @@ authModule.directive('ngAuthMenu', [function() {
 			modalOk: '@',
 			modalCancel: '@',
 			modalErrorMessage: '@'
-		}, controller : ['$scope','$auth','$uibModal','$rootScope',function($scope, $auth,$uibModal,$rootScope) {
+		}, controller : ['$scope','$auth','$rootScope',function($scope, $auth,$rootScope) {
 			$scope.user={};
 			$scope.authenticated= false;
 			// event register
@@ -32,48 +32,8 @@ authModule.directive('ngAuthMenu', [function() {
 			// try get the user in case he already logged.
 			$auth.login();
 			
-			//function for show the modal.
-			var showModal = function(haveError) {
-				var modalInstance = $uibModal.open({
-				      animation: false,
-				      templateUrl: 'directives/modules/login.html',
-				      controller: 'AuthLoginModalCtrl',
-				      size: '',
-				      resolve: {
-				    	  modalMessage: function () {
-				    		  var message = {
-				    			title: $scope.modalTitle,
-				    		  	username: $scope.modalUsername,
-				    		  	password: $scope.modalPassword,
-				    		  	ok: $scope.modalOk,
-				    		  	cancel: $scope.modalCancel,
-				    		  	error: $scope.modalErrorMessage
-				    		  }
-				            return message;
-				          },
-				          logInError : function() {
-							return haveError;
-						}
-				      }
-				    });
-				return modalInstance;
-			}
-			
-			
-			
 			$scope.login = function() {
-				
-				var modalInstance = showModal(false);
-				
-				modalInstance.result.then(function(credentials) {
-					$auth.login(credentials).then(function(user) {
-						//on est deja inscrit a l'event.
-					}, function() {
-						showModal(true);
-					});
-				}, function() {
-					//cancel modal
-				});
+				$auth.showModalLogin();
 			};
 			$scope.logout = function() {
 				$auth.logout();

@@ -3,7 +3,7 @@
  */
 
 var angularApp = angular.module('demoApp',['ngAnimate','ngRoute', 'ngResource','spring-data-rest','ui.bootstrap','ngSanitize','pascalprecht.translate', 'auth']); 
-angularApp.run(['$rootScope', 'LocaleFactory','$translate', function($rootScope, localeFactory,$translate) {
+angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth', function($rootScope, localeFactory,$translate,$auth) {
 	$rootScope.page = {};
 	$rootScope.alerts = [];
 	$rootScope.locales= [];
@@ -17,20 +17,42 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate', function($rootScope,
 		alert(result);
 	});
 	
+
+	
+	var onreadyTranslate = function() {
+		$translate('message.login').then(function (translation) {
+			$auth.modalTitle=translation;
+		});
+		$translate('message.username').then(function (translation) {
+			$auth.modalUsername=translation;
+		});
+		$translate('message.password').then(function (translation) {
+			$auth.modalPassword=translation;
+		});
+		$translate('message.login').then(function (translation) {
+			$auth.modalOk=translation;
+		});
+		$translate('message.cancel').then(function (translation) {
+			$auth.modalCancel=translation;
+		});
+		$translate('error.login').then(function (translation) {
+			$auth.modalErrorMessage=translation;
+		});
+	};
+	
 	localeFactory.getCurrent().then(function(current) {
 		$rootScope.locale = current;
 		$translate.use($rootScope.locale);
+		$translate.onReady(onreadyTranslate);
 	}, function(result) {
 		alert(result);
 	});
 	
-	$rootScope.toggled = function(open) {
-		//alert(open);
-	}
 	$rootScope.setLocale = function (locale) {
 		localeFactory.change(locale).then(function(current) {
 			$rootScope.locale = current;
 			$translate.use($rootScope.locale);
+			$translate.onReady(onreadyTranslate);
 		}, function(result) {
 			alert(result);
 		});
@@ -66,7 +88,7 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate', function($rootScope,
 			  properties:properties 
 		  };
 	};
-	
+    
 }]);
 
 angularApp.config(['$routeProvider', '$translateProvider','$httpProvider',function($routeProvider, 	$translateProvider,$httpProvider) {

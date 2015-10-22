@@ -40,12 +40,6 @@
 		<ng-auth-menu added-class="nav navbar-nav navbar-right" 
 		login-link-message="{{'message.login'| translate}}"
 		logout-link-message="{{'message.logout'| translate}}"
-		modal-title="{{'message.login'|translate}}"
-		modal-username="{{'message.username'| translate}}:"
-		modal-password="{{'message.password'| translate}}:"
-		modal-ok="{{'message.login'|translate}}"
-		modal-cancel="{{'message.cancel'|translate}}" 
-		modal-error-message="{{'error.login'|translate}}" 
 		></ng-auth-menu> 
 	</div>
 	</header>
