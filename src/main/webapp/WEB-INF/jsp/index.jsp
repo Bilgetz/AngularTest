@@ -37,10 +37,15 @@
 					</ul>
 				</div></li>
 		</ul>
-		<ul class="nav navbar-nav  navbar-right " ng-controller="LoginCtrl" >
-			<li ng-hide="authenticated" ><a href="" ng-click="login()">{{'message.login'| translate}}</a></li>
-			<li ng-show="authenticated" ><a href="" ng-click="logout()">{{'message.logout'| translate}} {{user.name}}</a></li>
-		</ul>
+		<ng-auth-menu added-class="nav navbar-nav navbar-right" 
+		login-link-message="{{'message.login'| translate}}"
+		logout-link-message="{{'message.logout'| translate}}"
+		modal-title="{{'message.login'|translate}}"
+		modal-username="{{'message.username'| translate}}:"
+		modal-password="{{'message.password'| translate}}:"
+		modal-ok="{{'message.login'|translate}}"
+		modal-cancel="{{'message.cancel'|translate}}" 
+		></ng-auth-menu> 
 	</div>
 	</header>
 	<div style="height: 50px"> </div>
@@ -61,6 +66,10 @@
 <script type="text/javascript" src="lib/angular-translate-loader-url.min.js"></script>
 <script type="text/javascript" src="lib/angular-animate.min.js"></script>
 
+<script type="text/javascript" src="js/modules/main.js"></script>
+<script type="text/javascript" src="js/modules/controllers.js"></script>
+<script type="text/javascript" src="js/modules/services.js"></script>
+<script type="text/javascript" src="js/modules/directives.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
 <script type="text/javascript" src="js/services.js"></script>
 <script type="text/javascript" src="js/controllers.js"></script>

@@ -1,0 +1,23 @@
+
+<div class="modal-header">
+	<h3 class="modal-title">{{modalMessage.title}}</h3>
+</div>
+
+<div class="modal-body">
+	<form role="form" ng-submit="ok()">
+		<div class="input-group"  class="input-group-addon">
+			<label for="username"  class="input-group-addon">{{modalMessage.username}}</label> <input
+				type="text" class="form-control" id="username" name="username"
+				ng-model="credentials.username" />
+		</div>
+		<div class="input-group">
+			<label for="password"  class="input-group-addon">{{modalMessage.password}}</label> <input
+				type="password" class="form-control" id="password" name="password"
+				ng-model="credentials.password" />
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary" type="button" ng-click="ok()">{{modalMessage.ok}}</button>
+	<button class="btn btn-warning" type="button" ng-click="cancel()">{{modalMessage.cancel}}</button>
+</div>

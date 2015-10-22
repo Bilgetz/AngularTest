@@ -2,7 +2,7 @@
  * 
  */
 
-var angularApp = angular.module('demoApp',['ngAnimate','ngRoute', 'ngResource','spring-data-rest','ui.bootstrap','ngSanitize','pascalprecht.translate']); 
+var angularApp = angular.module('demoApp',['ngAnimate','ngRoute', 'ngResource','spring-data-rest','ui.bootstrap','ngSanitize','pascalprecht.translate', 'auth']); 
 angularApp.run(['$rootScope', 'LocaleFactory','$translate', function($rootScope, localeFactory,$translate) {
 	$rootScope.page = {};
 	$rootScope.alerts = [];
