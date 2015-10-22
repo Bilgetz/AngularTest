@@ -106,7 +106,7 @@ authModule.factory('$auth', ['$q','$http','$rootScope','$uibModal',function($q,$
 						return deferred.resolve('close');
 					}, function() {
 						//login KO, ben on redemande
-						return showModal(true);
+						return deferred.resolve(showModal(true));
 					});
 				}, function() {
 					//cancel modal
@@ -126,6 +126,8 @@ authModule.factory('authInterceptor', ['$q', '$injector',function($q,$injector) 
 	  var interceptor = {
 	    // optional method
 	   'responseError': function(response) {
+		   //on ne peut pas se faire injecter $auth, ca ca ferai une reference recusive.
+		   //donc on al demande au runtime
 		   var $auth = $injector.get('$auth');
 		   if(response.config.url != $auth.loginPath &&
 				   response.config.url != $auth.logoutPath &&
