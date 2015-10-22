@@ -38,7 +38,7 @@
 				</div></li>
 		</ul>
 		<ul class="nav navbar-nav  navbar-right " ng-controller="LoginCtrl" >
-			<li ng-hide="authenticated" ><a href="#/login">{{'message.login'| translate}}</a></li>
+			<li ng-hide="authenticated" ><a href="" ng-click="login()">{{'message.login'| translate}}</a></li>
 			<li ng-show="authenticated" ><a href="" ng-click="logout()">{{'message.logout'| translate}} {{user.name}}</a></li>
 		</ul>
 	</div>
@@ -60,9 +60,9 @@
 <script type="text/javascript" src="lib/angular-translate.min.js"></script>
 <script type="text/javascript" src="lib/angular-translate-loader-url.min.js"></script>
 
-<script type="text/javascript" src="app.js"></script>
-<script type="text/javascript" src="services.js"></script>
-<script type="text/javascript" src="controllers.js"></script>
-<script type="text/javascript" src="directives.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/services.js"></script>
+<script type="text/javascript" src="js/controllers.js"></script>
+<script type="text/javascript" src="js/directives.js"></script>
 </body>
 </html>
