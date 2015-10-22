@@ -59,6 +59,7 @@
 <script type="text/javascript" src="lib/angular-sanitize.min.js"></script>
 <script type="text/javascript" src="lib/angular-translate.min.js"></script>
 <script type="text/javascript" src="lib/angular-translate-loader-url.min.js"></script>
+<script type="text/javascript" src="lib/angular-animate.min.js"></script>
 
 <script type="text/javascript" src="js/app.js"></script>
 <script type="text/javascript" src="js/services.js"></script>

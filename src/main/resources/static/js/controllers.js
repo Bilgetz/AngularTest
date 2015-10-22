@@ -126,9 +126,9 @@ function CommentsCtrl($scope,$rootScope, $PostFactory,$CommentFactory,$routepara
 	}
 }
 
-angularApp.controller('LoginCtrl',['$scope','$rootScope','LoginFactory', '$location' ,LoginCtrl]);
-function LoginCtrl($scope,$rootScope,LoginFactory, $location) {
-	$scope.credentials = {};
+angularApp.controller('LoginCtrl',['$scope','$rootScope','LoginFactory', '$location' ,'$uibModal',LoginCtrl]);
+function LoginCtrl($scope,$rootScope,LoginFactory, $location,$uibModal) {
+
 	$scope.user = {};
 	//on tente de recup l'utilisateur, avec du bol, il est deja connecte
 	LoginFactory.get().then(function(user) {
@@ -143,22 +143,36 @@ function LoginCtrl($scope,$rootScope,LoginFactory, $location) {
 		 $rootScope.authenticated = false;
 		 $scope.user = {};
 	});
+	
 	$scope.login = function() {
-		LoginFactory.login($scope.credentials).then(function(user) {
-			if(user.name) {
-				$rootScope.authenticated = true;
-				$scope.user = user;
-				$location.path("/");
-			} else {
-				$rootScope.authenticated = false;
-				$scope.user = {};
-			}
-		}, function(errors) {
-			 $rootScope.authenticated = false;
-			 $scope.user = {};
-			var err= $rootScope.generateErrorList(errors);
-			$rootScope.addAlert({type:'danger', msg: err.status });
-		});
+		
+		var modalInstance = $uibModal.open({
+		      animation: false,
+		      templateUrl: 'directives/login.html',
+		      controller: 'LoginModalCtrl',
+		      size: ''
+		    });
+		
+		modalInstance.result.then(function (credentials) {
+			LoginFactory.login(credentials).then(function(user) {
+				if(user.name) {
+					$rootScope.authenticated = true;
+					$scope.user = user;
+					$location.path("/");
+				} else {
+					$rootScope.authenticated = false;
+					$scope.user = {};
+				}
+			}, function(errors) {
+				 $rootScope.authenticated = false;
+				 $scope.user = {};
+				var err= $rootScope.generateErrorList(errors);
+				$rootScope.addAlert({type:'danger', msg: err.status });
+			});
+			
+		    }, function () {
+		      //$log.info('Modal dismissed at: ' + new Date());
+		    });
 	}
 	$scope.logout = function() {
 		LoginFactory.logout().then(function() {
@@ -173,3 +187,15 @@ function LoginCtrl($scope,$rootScope,LoginFactory, $location) {
 	}
 }
 
+angularApp.controller('LoginModalCtrl',['$scope','$modalInstance' ,LoginModalCtrl]);
+function LoginModalCtrl($scope, $modalInstance) {
+	$scope.credentials = {};
+	$scope.ok = function() {
+		$modalInstance.close($scope.credentials);
+		$scope.credentials = {};
+	}
+	$scope.cancel = function() {
+		 $scope.credentials = {};
+		 $modalInstance.dismiss('cancel');
+	}
+}
