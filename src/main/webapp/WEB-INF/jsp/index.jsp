@@ -45,6 +45,7 @@
 		modal-password="{{'message.password'| translate}}:"
 		modal-ok="{{'message.login'|translate}}"
 		modal-cancel="{{'message.cancel'|translate}}" 
+		modal-error-message="{{'error.login'|translate}}" 
 		></ng-auth-menu> 
 	</div>
 	</header>

@@ -25,7 +25,7 @@ authModule.factory('$auth', ['$q','$http','$rootScope',function($q,$http,$rootSc
 		        + btoa(credentials.username + ":" + credentials.password)
 			}} : {};
 			
-			var httpPromise = $http.get('user', config).then(function(response) {
+			var httpPromise = $http.get('login', config).then(function(response) {
 				auth.user = response.data;
 				auth.authenticated = true;
 				$rootScope.$broadcast('loggedIn',auth.user);
