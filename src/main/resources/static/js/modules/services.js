@@ -20,10 +20,6 @@ authModule.factory('$auth', ['$q','$http','$rootScope','$uibModal',function($q,$
 			auth.loginPath = loginPath;
 			auth.logoutPath = logoutPath;
 		},
-		clear: function() {
-			auth.authenticated = false;
-			//do the logout
-		},
 		login: function(credentials) {
 			var deferred = $q.defer();
 			
@@ -117,6 +113,28 @@ authModule.factory('$auth', ['$q','$http','$rootScope','$uibModal',function($q,$
 			}
 
 			return showModal(false);
+		},
+		hasRole: function(rolesParam) {
+			var roles = [];
+			if(angular.isString(rolesParam)) {
+				var hasRoleValue = rolesParam.split(',');
+		    	  for (var i = 0, l = hasRoleValue.length ; i <l; i++) {
+		    		  var role = hasRoleValue[i].trim();
+		    		  if(role != '') {
+		    			  roles.push(role);
+		    		  }
+		    	  }
+			} else if(angular.isArray(rolesParam)) {
+				roles = rolesParam;
+			}
+			
+			var ok = false;
+	    	  if(auth.user != undefined &&  auth.user.authorities != undefined) {
+	    		  for (var i = 0,l = auth.user.authorities.length; i < l; i++) {
+					ok = ok || (roles.indexOf(auth.user.authorities[i].authority) != -1);
+				}
+	    	  }
+	    	return ok;
 		}
 	}
 	return auth;

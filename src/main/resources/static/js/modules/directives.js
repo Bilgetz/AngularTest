@@ -41,3 +41,59 @@ authModule.directive('ngAuthMenu', [function() {
 		}]
 	}
 }]);
+
+
+authModule.directive('ngHasAnyRole', ['ngIfDirective', '$auth','$rootScope',function(ngIfDirective, $auth,$rootScope) {
+	var ngIf = ngIfDirective[0];
+
+	  return {
+	    transclude: ngIf.transclude,
+	    priority: ngIf.priority,
+	    terminal: ngIf.terminal,
+	    restrict: ngIf.restrict,
+	    scope:{},
+	    link: function($scope, $element, $attr) {
+	    	$scope.authenticated = $auth.authenticated;
+	    	$rootScope.$on('loggedIn', function (event,user) {
+	    		$scope.authenticated= true;
+	        });
+	    	$rootScope.$on('loggedOut', function () {
+	    		$scope.authenticated= false;
+	        });
+	      $scope.checkAuthorities= function() {
+	    	  return $auth.hasRole($attr['ngHasAnyRole']);
+	      }
+	      
+	      $attr.ngIf = "authenticated && checkAuthorities()";
+	      
+	      ngIf.link.apply(ngIf, arguments);
+	    }
+	  };
+}]);
+authModule.directive('ngHasNotRole', ['ngIfDirective', '$auth','$rootScope',function(ngIfDirective, $auth,$rootScope) {
+	var ngIf = ngIfDirective[0];
+	
+	return {
+		transclude: ngIf.transclude,
+		priority: ngIf.priority,
+		terminal: ngIf.terminal,
+		restrict: ngIf.restrict,
+		scope:{},
+		link: function($scope, $element, $attr) {
+			$scope.authenticated = $auth.authenticated;
+			$rootScope.$on('loggedIn', function (event,user) {
+				$scope.authenticated= true;
+			});
+			$rootScope.$on('loggedOut', function () {
+				$scope.authenticated= false;
+			});
+			$scope.checkAuthorities= function() {
+				return $auth.hasRole($attr['ngHasNotRole']);
+			}
+			
+			$attr.ngIf = "!(authenticated && checkAuthorities())";
+			
+			ngIf.link.apply(ngIf, arguments);
+		}
+	};
+}]);
