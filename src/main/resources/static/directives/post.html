@@ -7,7 +7,7 @@
 
 <p>{{data.content}}</p>
 <p>
-	<a ng-has-any-role="ROLE_USER" href="#/comments/{{data.id}}">{{data.comments.length}}
+	<a ng-has-any-role="ROLE_USER" href="#/comments/{{data.id}}">{{data.nbComment}}
 		{{'message.comments'|translate}}</a>
-	<span ng-has-not-role="ROLE_USER">{{data.comments.length}} {{'message.comments'|translate}}</span>
+	<span ng-has-not-role="ROLE_USER">{{data.nbComment}} {{'message.comments'|translate}}</span>
 </p>

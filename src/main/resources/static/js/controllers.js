@@ -27,7 +27,7 @@ function PostsCtrl($scope,$rootScope,  $PostFactory, $CategoryFactory) {
 	
 	
 	$scope.pageChanged = function() {
-		$PostFactory.find($scope.page.number, $scope.page.size,$scope.criterias).then(function(result) {
+		$PostFactory.find($scope.page.number, $scope.page.size,$scope.criterias,['category']).then(function(result) {
 			$scope.posts = result.posts;
 			$rootScope.page = result.page;
 			$rootScope.loading = false;
@@ -66,7 +66,7 @@ function CommentsCtrl($scope,$rootScope, $PostFactory,$CommentFactory,$routepara
 	$rootScope.loading = true;
 	$scope.newComment = {};
 	
-	$PostFactory.get($routeparams.id).then(function(post) {
+	$PostFactory.get($routeparams.id,['comments','category']).then(function(post) {
 		$scope.comments =post.comments;
 		$scope.title =post.name;
 		$scope.post = post;

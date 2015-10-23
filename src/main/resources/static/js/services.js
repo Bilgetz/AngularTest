@@ -7,7 +7,7 @@ angularApp.factory('PostFactory', ['$http','$q','SpringDataRestAdapter' ,PostFac
 function PostFactory($http, $q, SpringDataRestAdapter) {
 	var factory = {
 		posts : false,
-		find : function(page, limit, criterias) {
+		find : function(page, limit, criterias,subToLoad) {
 			var deferred = $q.defer();
 			var search='';
 			for (var i = 0, l = criterias.length; i < l; i++) {
@@ -19,14 +19,14 @@ function PostFactory($http, $q, SpringDataRestAdapter) {
 			}
 			
 			var httpPromise = $http.get(url);
-			SpringDataRestAdapter.process(httpPromise, ['comments','category']).then(function (processedResponse) {
+			SpringDataRestAdapter.process(httpPromise, subToLoad).then(function (processedResponse) {
 				var posts = processedResponse._embeddedItems != undefined ? processedResponse._embeddedItems : [];
 				processedResponse.page.number++;
 				for (var i = 0, l=posts.length; i < l; i++) {
-					if(posts[i].comments._embeddedItems != undefined) {
+					if(posts[i].comments != undefined && posts[i].comments._embeddedItems != undefined) {
 						posts[i].comments = posts[i].comments._embeddedItems ;
 					}
-					if(posts[i].category._embeddedItems != undefined) {
+					if(posts[i].category != undefined && posts[i].category._embeddedItems != undefined) {
 						posts[i].category = posts[i].category._embeddedItems ;
 					}
 				}
@@ -41,13 +41,16 @@ function PostFactory($http, $q, SpringDataRestAdapter) {
 			
 			return deferred.promise;
 		},
-		get : function(id) {
+		get : function(id, subToLoad) {
 			var deferred = $q.defer();
 			var httpPromise = $http.get('posts/' +id);
-			SpringDataRestAdapter.process(httpPromise, ['comments','category']).then(function (processedResponse) {
+			SpringDataRestAdapter.process(httpPromise, subToLoad).then(function (processedResponse) {
 				var post = processedResponse;
-				if(post.comments._embeddedItems != undefined) {
+				if(post.comments != undefined && post.comments._embeddedItems != undefined) {
 					post.comments = post.comments._embeddedItems ;
+				}
+				if(post.category != undefined && post.category._embeddedItems != undefined) {
+					post.category = post.category._embeddedItems ;
 				}
 				deferred.resolve(post);
 	        },function(response, status) {

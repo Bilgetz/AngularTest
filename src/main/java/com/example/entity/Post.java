@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Formula;
+
 import com.example.enums.State;
 
 import lombok.Data;
@@ -59,5 +61,8 @@ public class Post implements Serializable {
 	/** The comments. */
 	@OneToMany(mappedBy = "post")
 	private List<Comment> comments;
+
+	@Formula(value = "select count(*) from comment c where c.idpost=id")
+	private int nbComment;
 
 }
