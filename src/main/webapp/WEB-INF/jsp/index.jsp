@@ -14,6 +14,30 @@
 	.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 </style>
 <title>Test angular avec Spring data rest</title>
+<script type="text/javascript">
+	if('serviceWorker' in navigator) {
+		navigator.serviceWorker.register('service-worker.js').then(function(registration) {
+			console.log('SW ok ^^' , registration.scope);
+			
+			//je post un message a mon SW
+			// ca peut etre n'importe quel objet
+			//registration.active.postMessage({command: 'forceUptade', foobar: 42});
+			
+		}).catch(function(err){
+			console.log('SW KO ><' , err);
+		});
+	} else {
+		console.log('pas de WS :/');
+	}
+	
+	window.addEventListener('message', function(event){
+		//un message venant du SW
+		console.log(event.data);
+	});
+	
+
+</script>
+
 </head>
 <body ng-app="demoApp">
 <!-- http://www.grafikart.fr/formations/angularjs -->

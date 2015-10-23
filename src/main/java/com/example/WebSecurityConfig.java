@@ -21,7 +21,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		// @formatter:off
 		http.httpBasic().and().authorizeRequests()
-				.antMatchers("/", "/directives/**", "/lib/*", 
+				.antMatchers("/","/service-worker.js" , "/directives/**", "/lib/*", 
 						"/locales", "/locales/*","/locale", "/partials", 
 						"/categories/**/*","/categories/",
 						"/comments/", "/comments/**/*",
