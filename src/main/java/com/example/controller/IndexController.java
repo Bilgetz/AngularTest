@@ -1,8 +1,15 @@
 package com.example.controller;
 
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.example.manifest.Manifest;
 
 /**
  * The Class IndexController.
@@ -39,5 +46,16 @@ public class IndexController {
 	// public String partialsComments() {
 	// return "partials/comments";
 	// }
+
+	@RequestMapping(value = "/manifest.webapp", method = { RequestMethod.GET })
+	public @ResponseBody Manifest manifest(HttpServletRequest request, Locale locale) {
+		Manifest manifest = new Manifest();
+		String path = request.getContextPath();
+		manifest.setLang(locale.getLanguage());
+		manifest.setLaunch_path(path);
+		manifest.getIcons().put("128", "icon128.png");
+		manifest.getIcons().put("512", "icon512.png");
+		return manifest;
+	}
 
 }
