@@ -61,7 +61,7 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth', function($ro
 	
 	$rootScope.addAlert = function(alert) {
 		$rootScope.alerts.push(alert);
-	  };
+    };
 
 	  $rootScope.closeAlert = function(index) {
 		  $rootScope.alerts.splice(index, 1);
@@ -88,6 +88,8 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth', function($ro
 			  properties:properties 
 		  };
 	};
+	
+	$auth.initServiceWorker();
     
 }]);
 

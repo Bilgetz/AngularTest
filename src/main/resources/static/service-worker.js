@@ -75,19 +75,28 @@ self.addEventListener('fetch', function(event) {
 	  );
 	});
 
-
+/***
+ * Methode de reception message client vers worker
+ */
 self.addEventListener('message', function(event) {
+	console.log('### message recu ####', JSON.stringify(event.data));
+	
 	//on recoit un message !
 	//ca peut permettre de mettre a jour son cache ^^
 	if(event.data.command == 'forceUpdate') {
 		console.log('foobar est a ', event.data.foobar);
 	}
-	clients.getAll().then(function(clients) {
-		clients.forEach(function(client) {
-			//on peut envoyer au clients des objects egalement 
-			client.postMessage({command: 'disconect'});
-		})
-	});
+	console.log('from : ' + event.data.origin);
+	
+	if(event.data.origin == 'angular-auth') {
+		console.log('from angular auth ! ');
+		clients.matchAll().then(function(clients) {
+			clients.forEach(function(client) {
+				//on peut envoyer au clients des objects egalement 
+				client.postMessage(event.data);
+			})
+		});
+	}
 	
 });
 

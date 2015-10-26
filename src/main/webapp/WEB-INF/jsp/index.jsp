@@ -4,6 +4,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+
+<!-- Startup configuration -->
+<link rel="manifest" href="manifest.webmanifest">
+
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -19,9 +23,18 @@
 		navigator.serviceWorker.register('service-worker.js').then(function(registration) {
 			console.log('SW ok ^^' , registration.scope);
 			
+			//navigator.serviceWorker.addEventListener('message', function(event){
+				//un message venant du SW
+			//console.log(event.data);
+			//});
 			//je post un message a mon SW
 			// ca peut etre n'importe quel objet
-			//registration.active.postMessage({command: 'forceUptade', foobar: 42});
+			if(navigator.serviceWorker.controller != null) {
+				//registration.active.postMessage({command: 'forceUpdate', foobar: 42});
+				console.log('SW actif');
+			} else {
+				console.log('SW pas actif');
+			}
 			
 		}).catch(function(err){
 			console.log('SW KO ><' , err);
@@ -30,10 +43,6 @@
 		console.log('pas de WS :/');
 	}
 	
-	window.addEventListener('message', function(event){
-		//un message venant du SW
-		console.log(event.data);
-	});
 	
 
 </script>

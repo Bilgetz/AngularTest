@@ -15,6 +15,7 @@ authModule.factory('$auth', ['$q','$http','$rootScope','$uibModal',function($q,$
 	  	modalOk:'ok',
 	  	modalCancel:'cancel',
 	  	modalErrorMessage : 'error',
+	  	swActivate: false,
 		init : function(homePath, loginPath, logoutPath) {
 			auth.homePath = homePath;
 			auth.loginPath = loginPath;
@@ -31,6 +32,11 @@ authModule.factory('$auth', ['$q','$http','$rootScope','$uibModal',function($q,$
 				auth.user = response.data;
 				auth.authenticated = true;
 				$rootScope.$broadcast('loggedIn',auth.user);
+				// service worker ^^
+				if('serviceWorker' in navigator && navigator.serviceWorker != null 
+						&& navigator.serviceWorker.controller != null) {
+					navigator.serviceWorker.controller.postMessage({origin : 'angular-auth', command: 'login', user :auth.user });
+				}
 				deferred.resolve(auth.user);
 			}, function(response) {
 				var result;
@@ -50,17 +56,27 @@ authModule.factory('$auth', ['$q','$http','$rootScope','$uibModal',function($q,$
 			var deferred = $q.defer();
 			$http.post(auth.logoutPath, {}).then(function(response) {
 				auth.authenticated = false;
+				auth.user = {};
 				$rootScope.$broadcast('loggedOut');
+				if('serviceWorker' in navigator && navigator.serviceWorker != null 
+						&& navigator.serviceWorker.controller != null) {
+					navigator.serviceWorker.controller.postMessage({origin : 'angular-auth', command: 'logout', user :{} });
+				}
 				deferred.resolve(response);
 			}, function (response) {
 				var result;
 				auth.authenticated = false;
+				auth.user = {};
 				if(response.data != undefined && response.data.errors != undefined) {
 					result = response.data.errors;
 				} else  {
 					result = [{property: 'Cannot logout ' , message:  response.statusText }];
 				}
 				$rootScope.$broadcast('loggedOut');
+				if('serviceWorker' in navigator && navigator.serviceWorker != null 
+						&& navigator.serviceWorker.controller != null) {
+					navigator.serviceWorker.controller.postMessage({origin : 'angular-auth', command: 'logout', user :{} });
+				}
 				deferred.reject(result);
 			});
 			return deferred.promise;
@@ -135,8 +151,35 @@ authModule.factory('$auth', ['$q','$http','$rootScope','$uibModal',function($q,$
 				}
 	    	  }
 	    	return ok;
+		},
+		initServiceWorker : function() {
+			if('serviceWorker' in navigator && navigator.serviceWorker != null ) {
+				navigator.serviceWorker.addEventListener('message', function(event){
+					//{origin : 'angular-auth', command: 'logout', user :{} }
+					if(event.data.origin == 'angular-auth') {
+						if(event.data.command == 'login') {
+							$rootScope.$apply(function() {
+								auth.user = event.data.user;
+								auth.authenticated = true;
+								$rootScope.$broadcast('loggedIn',auth.user);
+							});
+						} else if(event.data.command == 'logout') {
+							$rootScope.$apply(function() {
+								auth.authenticated = false;
+								auth.user = {};
+								$rootScope.$broadcast('loggedOut');
+							});
+						}
+					}
+
+				});
+				auth.swActivate = true;
+			}
 		}
-	}
+	};
+	
+	
+	
 	return auth;
 }]);
 
