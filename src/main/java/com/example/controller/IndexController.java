@@ -1,5 +1,8 @@
 package com.example.controller;
 
+import static com.example.manifest.EnumDisplay.STANDALONE;
+import static com.example.manifest.EnumOrientation.LANDSCAPE;
+
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.manifest.Icon;
 import com.example.manifest.Manifest;
 
 /**
@@ -37,24 +41,18 @@ public class IndexController {
 		return "partials/index";
 	}
 
-	/**
-	 * Partials comments.
-	 *
-	 * @return the string
-	 */
-	// @RequestMapping(value = "/partials/comments")
-	// public String partialsComments() {
-	// return "partials/comments";
-	// }
-
 	@RequestMapping(value = "/manifest.webapp", method = { RequestMethod.GET })
 	public @ResponseBody Manifest manifest(HttpServletRequest request, Locale locale) {
 		Manifest manifest = new Manifest();
-		String path = request.getContextPath();
-		manifest.setLang(locale.getLanguage());
-		manifest.setLaunch_path(path);
-		manifest.getIcons().put("128", "icon128.png");
-		manifest.getIcons().put("512", "icon512.png");
+		manifest.setBackground_color("white");
+		manifest.setDisplay(STANDALONE);
+		manifest.getIcons().add(new Icon("icon/icon.png", "64x64", "image/png", null));
+		manifest.setLang("fr");
+		manifest.setOrientation(LANDSCAPE);
+		manifest.setPrefer_related_applications(false);
+		manifest.setStart_url("./");
+		manifest.setScope(request.getContextPath());
+		manifest.setShort_name("tes angular");
 		return manifest;
 	}
 
