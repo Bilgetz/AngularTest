@@ -18,6 +18,7 @@ urlToCache = [
               'directives/modules/login.html',
               'directives/paging.html',
               'directives/post.html',
+              'directives/posts.html',
               'js/app.js','js/controllers.js','js/directives.js','js/modules/controllers.js',
               'js/modules/directives.js','js/modules/main.js','js/modules/services.js',
               'js/services.js',

@@ -122,9 +122,8 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth', function($ro
 
 angularApp.config(['$routeProvider', '$translateProvider','$httpProvider',function($routeProvider, 	$translateProvider,$httpProvider) {
 	$routeProvider
-		.when('/',{templateUrl: 'partials', controller : 'PostsCtrl'})
+		.when('/',{templateUrl: 'directives/posts.html', controller : 'PostsCtrl'})
 		.when('/comments/:id',{templateUrl: 'directives/comments.html', controller : 'CommentsCtrl'})
-		.when('/login', {templateUrl : 'directives/login.html', controller : 'LoginCtrl'})
 		.otherwise({redirectTo: '/'});
 	
 	$translateProvider.useUrlLoader('locales/current');

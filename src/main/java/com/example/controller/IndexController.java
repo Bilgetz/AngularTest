@@ -32,15 +32,14 @@ public class IndexController {
 	}
 
 	/**
-	 * Index partial.
+	 * Manifest.
 	 *
-	 * @return the string
+	 * @param request
+	 *            the request
+	 * @param locale
+	 *            the locale
+	 * @return the manifest
 	 */
-	@RequestMapping(value = "/partials", method = { RequestMethod.GET })
-	public String indexPartial() {
-		return "partials/index";
-	}
-
 	@RequestMapping(value = "/manifest.webapp", method = { RequestMethod.GET })
 	public @ResponseBody Manifest manifest(HttpServletRequest request, Locale locale) {
 		Manifest manifest = new Manifest();
