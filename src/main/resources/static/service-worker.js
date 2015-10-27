@@ -27,10 +27,7 @@ urlToCache = [
               'lib/angular-translate-loader-url.min.js','lib/angular-translate.min.js',
               'lib/angular.1.4.7.min.js','lib/bootstrap.js','lib/bootstrap.min.js',
               'lib/restangular.1.4.0.min.js','lib/ui-bootstrap-tpls-0.14.2.min.js',
-              'lib/underscore.1.8.3-min.js',
-              /** web specific*/
-              
-              'locales',
+              'lib/underscore.1.8.3-min.js'
               ];
 
 
@@ -49,16 +46,13 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('activate', function(event) {
 	console.log('activate SW');
-  var expectedCacheNames = Object.keys(CURRENT_CACHES).map(function(key) {
-    return CURRENT_CACHES[key];
-  });
-
   // Active worker won't be treated as activated until promise resolves successfully.
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
+    	console.log('cacheNames ', cacheNames);
       return Promise.all(
         cacheNames.map(function(cacheName) {
-          if (expectedCacheNames.indexOf(cacheName) == -1) {
+          if (CURRENT_CACHE != cacheName) {
             console.log('Deleting out of date cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -70,48 +64,8 @@ self.addEventListener('activate', function(event) {
 
 
 
-//self.addEventListener('activate', function(event) {
-	//https://developer.mozilla.org/en-US/docs/Web/API/Cache
-	//lors de l'activation
-//	console.log('activate SW');
-//	caches.keys().then(function(keylist) {
-//		console.log('current cache = ');
-//		for (var i = 0, l=keylist.length; i < l; i++) {
-//			console.log('current key = ' keylist[i]);	
-//		}
-//		
-//	});
-	//menage ancien cache !
-//});
-/*
-self.addEventListener('fetch', function(event) {
-	console.log('request !!', event);
-//	if(event.request.url.match('/category')) {
-		event.respondWith(fetch(event.request).then(function(response){
-			console.log('response ');
-			return response;
-		}).catch(function(eroor) {
-			console.error('request eoor');
-			throw error;
-		}));
-//	} else {
-//		event.respondWith(caches.match(event.request));
-//	}
-		//on peut recup tous les clients ( onglets sous FF )
-//		clients.getAll().then(function(clients) {
-//			clients.forEach(function(client) {
-//				//on peut envoyer au clients des objects egalement 
-//				client.postMessage({command: 'disconect'});
-//			})
-//		});
-});
-*/
-
 self.addEventListener('fetch', function(event) {
 	  console.log('Handling fetch event for', event.request.url);
-//	  for ( var iterable_element in event.request) {
-//		  console.log('Handling fetch event =', iterable_element, JSON.stringify(event.request[iterable_element]));
-//	  }
 	  
 	  event.respondWith(
 	    caches.match(event.request).then(function(response) {
