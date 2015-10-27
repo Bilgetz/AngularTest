@@ -5,8 +5,33 @@
  * http://www.w3.org/TR/appmanifest/
  */
 
-var CURRENT_CACHE = 'mon-site-v1',
-urlToCache = ['/demo/css/bootstrap.min.css', '/demo/posts/2/','/demo/posts/2/category'];
+var CURRENT_CACHE = 'mon-site-v2',
+urlToCache = [
+              './',
+              'css/bootstrap-theme.min.css',
+              'css/bootstrap.min.css',
+              'directives/comment-edit.html',
+              'directives/comment.html',
+              'directives/comments.html',
+              'directives/filtering.html',
+              'directives/modules/auth-menu.html',
+              'directives/modules/login.html',
+              'directives/paging.html',
+              'directives/post.html',
+              'js/app.js','js/controllers.js','js/directives.js','js/modules/controllers.js',
+              'js/modules/directives.js','js/modules/main.js','js/modules/services.js',
+              'js/services.js',
+              'lib/angular-animate.min.js','lib/angular-resource.1.4.7.min.js',
+              'lib/angular-route.min.1.4.7.js','lib/angular-sanitize.min.js',
+              'lib/angular-spring-data-rest.0.4.3.min.js','lib/angular-spring-data-rest.js',
+              'lib/angular-translate-loader-url.min.js','lib/angular-translate.min.js',
+              'lib/angular.1.4.7.min.js','lib/bootstrap.js','lib/bootstrap.min.js',
+              'lib/restangular.1.4.0.min.js','lib/ui-bootstrap-tpls-0.14.2.min.js',
+              'lib/underscore.1.8.3-min.js',
+              /** web specific*/
+              
+              'locales',
+              ];
 
 
 self.addEventListener('install', function(event) {
@@ -21,11 +46,43 @@ self.addEventListener('install', function(event) {
 	);
 });
 
+
 self.addEventListener('activate', function(event) {
-	//lors de l'activation
 	console.log('activate SW');
-	//menage ancien cache !
+  var expectedCacheNames = Object.keys(CURRENT_CACHES).map(function(key) {
+    return CURRENT_CACHES[key];
+  });
+
+  // Active worker won't be treated as activated until promise resolves successfully.
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (expectedCacheNames.indexOf(cacheName) == -1) {
+            console.log('Deleting out of date cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });
+
+
+
+//self.addEventListener('activate', function(event) {
+	//https://developer.mozilla.org/en-US/docs/Web/API/Cache
+	//lors de l'activation
+//	console.log('activate SW');
+//	caches.keys().then(function(keylist) {
+//		console.log('current cache = ');
+//		for (var i = 0, l=keylist.length; i < l; i++) {
+//			console.log('current key = ' keylist[i]);	
+//		}
+//		
+//	});
+	//menage ancien cache !
+//});
 /*
 self.addEventListener('fetch', function(event) {
 	console.log('request !!', event);
@@ -52,19 +109,29 @@ self.addEventListener('fetch', function(event) {
 
 self.addEventListener('fetch', function(event) {
 	  console.log('Handling fetch event for', event.request.url);
-
+//	  for ( var iterable_element in event.request) {
+//		  console.log('Handling fetch event =', iterable_element, JSON.stringify(event.request[iterable_element]));
+//	  }
+	  
 	  event.respondWith(
 	    caches.match(event.request).then(function(response) {
 	      if (response) {
-	        console.log('Found response in cache:', response);
-
+	        console.log('Found response in cache for :', event.request.url);
 	        return response;
 	      }
-	      console.log('No response found in cache. About to fetch from network...');
+	      console.log('No response found in cache for :', event.request.url);
 
 	      return fetch(event.request).then(function(response) {
-	        console.log('Response from network is:', response);
-
+	    	  var absoluteUrl = event.request.url.substring(event.request.referrer.length);
+	        if(absoluteUrl.indexOf('locale') === 0) {
+	        	// on met en cache les properties
+	        	// elle seront supprimer du cache lors de la prochaine
+	        	// update du service worker
+	        	caches.open(CURRENT_CACHE).then(function(cache) {
+	        		console.log('Put in cache locale' , absoluteUrl);
+	        		cache.add(event.request, response);
+				});
+	        }
 	        return response;
 	      }).catch(function(error) {
 	        console.error('Fetching failed:', error);

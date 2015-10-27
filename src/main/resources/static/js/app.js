@@ -2,6 +2,33 @@
  * 
  */
 
+if('serviceWorker' in navigator) {
+	navigator.serviceWorker.register('service-worker.js').then(function(registration) {
+		console.log('SW ok ^^' , registration.scope);
+		
+		// navigator.serviceWorker.addEventListener('message',
+		// function(event){
+			// un message venant du SW
+		// console.log(event.data);
+		// });
+		// je post un message a mon SW
+		// ca peut etre n'importe quel objet
+		if(navigator.serviceWorker.controller != null) {
+			// registration.active.postMessage({command: 'forceUpdate',
+			// foobar: 42});
+			console.log('SW actif');
+		} else {
+			console.log('SW pas actif');
+		}
+		
+	}).catch(function(err){
+		console.log('SW KO ><' , err);
+	});
+} else {
+	console.log('pas de WS :/');
+}
+
+
 var angularApp = angular.module('demoApp',['ngAnimate','ngRoute', 'ngResource','spring-data-rest','ui.bootstrap','ngSanitize','pascalprecht.translate', 'auth']); 
 angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth', function($rootScope, localeFactory,$translate,$auth) {
 	$rootScope.page = {};

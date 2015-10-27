@@ -36,7 +36,8 @@ function PostFactory($http, $q, SpringDataRestAdapter) {
 					page : processedResponse.page
 				});
 	        },function(response, status) {
-				deferred.reject('error on loading' + response.statusText);
+	        	var responseText = response != undefined ? response.statusText : 'no response';
+				deferred.reject('error on loading' + responseText);
 			});
 			
 			return deferred.promise;
@@ -54,7 +55,8 @@ function PostFactory($http, $q, SpringDataRestAdapter) {
 				}
 				deferred.resolve(post);
 	        },function(response, status) {
-				deferred.reject('error on loading' + response.statusText);
+	        	var responseText = response != undefined ? response.statusText : 'no response';
+				deferred.reject('error on loading' + responseText);
 			});
 			
 			
@@ -82,10 +84,11 @@ function CommentFactory($http, $q, SpringDataRestAdapter) {
 				deferred.resolve(response);
 			}, function (response) {
 				var result;
-				if(response.data != undefined && response.data.errors != undefined) {
+				if(response != undefined && response.data != undefined && response.data.errors != undefined) {
 					result = response.data.errors;
 				} else  {
-					result = [{property: 'Cannot save ' , message:  response.statusText }];
+					var responseText = response != undefined ? response.statusText : 'no response';
+					result = [{property: 'Cannot save ' , message:  responseText }];
 				}
 				deferred.reject(result );
 			});
@@ -98,10 +101,11 @@ function CommentFactory($http, $q, SpringDataRestAdapter) {
 				deferred.resolve(response);
 			}, function (response) {
 				var result;
-				if(response.data != undefined && response.data.errors != undefined) {
+				if(response != undefined &&  response.data != undefined && response.data.errors != undefined) {
 					result = response.data.errors;
 				} else  {
-					result = [{property: 'Cannot save ' , message:  response.statusText }];
+					var responseText = response != undefined ? response.statusText : 'no response';
+					result = [{property: 'Cannot save ' , message:  responseText }];
 				}
 				deferred.reject(result);
 			});
@@ -113,10 +117,11 @@ function CommentFactory($http, $q, SpringDataRestAdapter) {
 				deferred.resolve(response);
 			}, function (response) {
 				var result;
-				if(response.data != undefined && response.data.errors != undefined) {
+				if(response != undefined && response.data != undefined && response.data.errors != undefined) {
 					result = response.data.errors;
 				} else  {
-					result = [{property: 'Cannot delete ' , message:  response.statusText }];
+					var responseText = response != undefined ? response.statusText : 'no response';
+					result = [{property: 'Cannot delete ' , message:  responseText }];
 				}
 				deferred.reject(result);
 			});
@@ -142,7 +147,8 @@ function CategoryFactory($http, $q, SpringDataRestAdapter) {
 						page : processedResponse.page
 					});
 		        },function(response, status) {
-					deferred.reject('error on loading' + response.statusText);
+		        	var responseText = response != undefined ? response.statusText : 'no response';
+					deferred.reject('error on loading' + responseText);
 				});
 				
 				return deferred.promise;
@@ -159,8 +165,9 @@ function LocaleFactory($http, $q, SpringDataRestAdapter) {
 				var deferred = $q.defer();
 				var httpPromise = $http.get('locales').then(function(response) {
 					deferred.resolve(response.data);
-				}, function() {
-					deferred.reject('error on loading' + response.statusText);
+				}, function(response, status) {
+					var responseText = (response != undefined ? response.statusText : 'no response');
+					deferred.reject('error on loading' + responseText);
 				});
 				return deferred.promise;
 			},
@@ -168,16 +175,18 @@ function LocaleFactory($http, $q, SpringDataRestAdapter) {
 				var deferred = $q.defer();
 				var httpPromise = $http.get('locale').then(function(response) {
 					deferred.resolve(response.data);
-				}, function() {
-					deferred.reject('error on loading' + response.statusText);
+				}, function(response, status) {
+					var responseText = (response != undefined ? response.statusText : 'no response');
+					deferred.reject('error on loading' + responseText);
 				});
 				return deferred.promise;
 			}, change: function (locale) {
 				var deferred = $q.defer();
 				var httpPromise = $http.get('locale?lang='+ locale).then(function(response) {
 					deferred.resolve(response.data);
-				}, function() {
-					deferred.reject('error on loading' + response.statusText);
+				}, function(response, status) {
+					var responseText = (response != undefined ? response.statusText : 'no response');
+					deferred.reject('error on loading' + responseText);
 				});
 				return deferred.promise;
 			},

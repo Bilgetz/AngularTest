@@ -76,3 +76,24 @@ eclipse {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.7'
 }
+
+
+def String generateDirectory(File directory, String relatif) {
+	String result = "";
+	file(directory).listFiles().each {
+		if(it.directory) {
+			result = result + generateDirectory(it, relatif + it.name + "/");
+		}
+		else {
+			result = result + "'"+relatif +it.name + "',";
+		}
+    }
+	return result;
+
+}
+
+task generateSWCache() {
+ 	 println('generate');
+ 	 println(generateDirectory(new File('src/main/resources/static'), ''));
+}
+
