@@ -56,6 +56,22 @@ self.addEventListener('activate', function(event) {
           if (CURRENT_CACHE != cacheName) {
             console.log('Deleting out of date cache:', cacheName);
             return caches.delete(cacheName);
+          } else {
+        	  
+        	  caches.open(CURRENT_CACHE).then(function(cache) {
+        		  cache.keys().then(function(response) {
+        		    response.forEach(function(element, index, array) {
+        		    	 var find =false;
+        		    	for (var i = 0, l = urlToCache.length; i < l && !find; i++) {
+        		    		find = (element.url.indexOf(urlToCache[i]) != -1);
+						}
+        		    	if(!find){
+        		    		console.log('Deleting out of url cache:', element.url, element.referrer);
+        		    		cache.delete(element);
+        		    	} 
+        		    });
+        		  });
+        		})
           }
         })
       );
