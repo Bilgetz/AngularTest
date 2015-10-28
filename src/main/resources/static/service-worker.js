@@ -5,7 +5,7 @@
  * http://www.w3.org/TR/appmanifest/
  */
 
-var CURRENT_CACHE = 'mon-site-v2',
+var CURRENT_CACHE = 'test-angular-v1',
 urlToCache = [
               './',
               'css/bootstrap-theme.min.css',
@@ -57,18 +57,19 @@ self.addEventListener('activate', function(event) {
             console.log('Deleting out of date cache:', cacheName);
             return caches.delete(cacheName);
           } else {
-        	  
         	  caches.open(CURRENT_CACHE).then(function(cache) {
         		  cache.keys().then(function(response) {
         		    response.forEach(function(element, index, array) {
-        		    	 var find =false;
-        		    	for (var i = 0, l = urlToCache.length; i < l && !find; i++) {
-        		    		find = (element.url.indexOf(urlToCache[i]) != -1);
-						}
-        		    	if(!find){
-        		    		console.log('Deleting out of url cache:', element.url, element.referrer);
-        		    		cache.delete(element);
-        		    	} 
+        		    	if(element.referrer.indexOf("http") === 0) {
+	        		    	var find =false;
+	        		    	for (var i = 0, l = urlToCache.length; i < l && !find; i++) {
+	        		    		find = (element.url.indexOf(urlToCache[i]) != -1);
+							}
+	        		    	if(!find){
+	        		    		console.log('Deleting out of url cache:', element.url, element.referrer);
+	        		    		cache.delete(element);
+	        		    	} 
+        		    	}
         		    });
         		  });
         		})
@@ -82,36 +83,58 @@ self.addEventListener('activate', function(event) {
 
 
 self.addEventListener('fetch', function(event) {
-	  console.log('Handling fetch event for', event.request.url);
+	  console.log('Handling fetch event for', event.request.url, event.request.referrer);
 	  
 	  event.respondWith(
-	    caches.match(event.request).then(function(response) {
-	      if (response) {
-	        console.log('Found response in cache for :', event.request.url);
-	        return response;
-	      }
-	      console.log('No response found in cache for :', event.request.url);
-
-	      return fetch(event.request).then(function(response) {
-	    	  var absoluteUrl = event.request.url.substring(event.request.referrer.length);
-	        if(absoluteUrl.indexOf('locale') === 0) {
-	        	// on met en cache les properties
-	        	// elle seront supprimer du cache lors de la prochaine
-	        	// update du service worker
-	        	caches.open(CURRENT_CACHE).then(function(cache) {
-	        		console.log('Put in cache locale' , absoluteUrl);
-	        		cache.add(event.request, response);
-				});
-	        }
-	        return response;
-	      }).catch(function(error) {
-	        console.error('Fetching failed:', error);
-
-	        throw error;
-	      });
-	    })
-	  );
-	});
+	  new Promise(function(resolve, reject) {
+		  var absoluteUrl = event.request.url.substring(event.request.referrer.length);
+		  if(absoluteUrl.length > 0 && absoluteUrl.indexOf('rest') === 0 || absoluteUrl.indexOf('local') === 0) {
+			  //c'est une request rest
+			  //ou une tentative de recupere le local
+			  // fetch puis cache
+			  console.error('rest ou local :', absoluteUrl);
+			  resolve(fetch(event.request).then(function(response) {
+				  console.error('rest ou local fetch ok  :', absoluteUrl);
+				  // fetch ok, on met en cache
+				  caches.open(CURRENT_CACHE).then(function(cache) {
+		        		console.log('Put in cache' , absoluteUrl);
+		        		cache.add(event.request, response);
+					});
+				  return response;
+			  }).catch(function(error) {
+				  console.error('rest ou local fetch ko  :', absoluteUrl);
+				  return caches.match(event.request).then(function(response) {
+					  if (response) {
+						  	console.error('rest ou local cache ok :', absoluteUrl);
+					        return response;
+				      } else {
+				    	  console.error('rest ou local  failed:', error);
+				    	  return Promise.reject(error);
+				      }
+				  })
+			  })
+			  ); 
+		  } else {
+			  //cache puis fetch
+			  resolve(caches.match(event.request).then(function(response) {
+				  if (response) {
+					  console.error('Autre, cache ok :', absoluteUrl);
+			        return response;
+			      }
+				  return fetch(event.request).then(function(response) {
+					  console.error('Autre, fetch ok :', absoluteUrl);
+					  return response;
+				  })
+			  }).catch(function(error) {
+			        console.error('Autre, failed:', error);
+			        return Promise.reject(error);
+			  })
+			  );
+			  
+		  }//fin if/else
+	  })//fin promise	  
+	  )//fin response with
+});
 
 /***
  * Methode de reception message client vers worker

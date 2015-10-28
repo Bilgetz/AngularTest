@@ -24,11 +24,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/","/service-worker.js" ,
 						"/manifest.webapp", 
 						"/directives/**", "/lib/*", 
-						"/locales", "/locales/*","/locale", "/partials", 
-						"/categories/**/*","/categories/",
-						"/comments/", "/comments/**/*",
-						"/posts/", "/posts/**/*"
-						
+						"/locales", "/locales/*","/locale", 
+						"/rest/**"
 						).permitAll()
 				.anyRequest().authenticated().and().addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class)
 				.csrf().csrfTokenRepository(csrfTokenRepository());

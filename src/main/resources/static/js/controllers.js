@@ -27,6 +27,7 @@ function PostsCtrl($scope,$rootScope,  $PostFactory, $CategoryFactory) {
 	
 	
 	$scope.pageChanged = function() {
+		$rootScope.loading = true;
 		$PostFactory.find($scope.page.number, $scope.page.size,$scope.criterias,['category']).then(function(result) {
 			$scope.posts = result.posts;
 			$rootScope.page = result.page;

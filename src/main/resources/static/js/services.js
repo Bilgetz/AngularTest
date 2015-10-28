@@ -13,7 +13,7 @@ function PostFactory($http, $q, SpringDataRestAdapter) {
 			for (var i = 0, l = criterias.length; i < l; i++) {
 				search+= criterias[i].field.id + criterias[i].operation.id + criterias[i].value.id + ',' 
 			}
-			var url = 'posts/search/findByCriteria?page='+ (page -1) + '&size=' +limit;
+			var url = 'rest/posts/search/findByCriteria?page='+ (page -1) + '&size=' +limit;
 			if(criterias.length > 0 ) {
 				url += '&search=' + search;
 			}
@@ -44,7 +44,7 @@ function PostFactory($http, $q, SpringDataRestAdapter) {
 		},
 		get : function(id, subToLoad) {
 			var deferred = $q.defer();
-			var httpPromise = $http.get('posts/' +id);
+			var httpPromise = $http.get('rest/posts/' +id);
 			SpringDataRestAdapter.process(httpPromise, subToLoad).then(function (processedResponse) {
 				var post = processedResponse;
 				if(post.comments != undefined && post.comments._embeddedItems != undefined) {
@@ -80,7 +80,7 @@ function CommentFactory($http, $q, SpringDataRestAdapter) {
 			
 			var data = angular.toJson(newComment);
 			
-			$http.post('comments/', data).then(function(response) {
+			$http.post('rest/comments/', data).then(function(response) {
 				deferred.resolve(response);
 			}, function (response) {
 				var result;
@@ -97,7 +97,7 @@ function CommentFactory($http, $q, SpringDataRestAdapter) {
 		edit : function (comment) {
 			var deferred = $q.defer();
 			var data = angular.toJson(comment);
-			$http.put('comments/' + comment.id, data).then(function(response) {
+			$http.put('rest/comments/' + comment.id, data).then(function(response) {
 				deferred.resolve(response);
 			}, function (response) {
 				var result;
@@ -113,7 +113,7 @@ function CommentFactory($http, $q, SpringDataRestAdapter) {
 		},
 		deleteEntity: function (comment) {
 			var deferred = $q.defer();
-			$http.delete('comments/' + comment.id).then(function(response) {
+			$http.delete('rest/comments/' + comment.id).then(function(response) {
 				deferred.resolve(response);
 			}, function (response) {
 				var result;
@@ -140,7 +140,7 @@ function CategoryFactory($http, $q, SpringDataRestAdapter) {
 	var factory = {
 			find : function(page, limit, criterias) {
 				var deferred = $q.defer();
-				var httpPromise = $http.get('categories/?size=99');
+				var httpPromise = $http.get('rest/categories/?size=99');
 				SpringDataRestAdapter.process(httpPromise).then(function (processedResponse) {
 					deferred.resolve({
 						categories :processedResponse._embeddedItems,
