@@ -118,6 +118,16 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth', function($ro
 	
 	$auth.initServiceWorker();
     
+	if(window.SharedWorker) {
+		var myWorker = new SharedWorker("js/shared_worker.js");
+		myWorker.port.start();
+		myWorker.port.onmessage = function(e) {
+			console.log('message from worker' + e.data);
+		}
+	}
+
+	
+	
 }]);
 
 angularApp.config(['$routeProvider', '$translateProvider','$httpProvider',function($routeProvider, 	$translateProvider,$httpProvider) {

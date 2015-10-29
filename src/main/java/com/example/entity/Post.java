@@ -3,6 +3,7 @@ package com.example.entity;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.Formula;
 
@@ -64,5 +66,8 @@ public class Post implements Serializable {
 
 	@Formula(value = "select count(*) from comment c where c.idpost=id")
 	private int nbComment;
+
+	@Version
+	private Date version;
 
 }

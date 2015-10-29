@@ -5,7 +5,7 @@
  * http://www.w3.org/TR/appmanifest/
  */
 
-var CURRENT_CACHE = 'test-angular-v1',
+var CURRENT_CACHE = 'test-angular-shred-worker-1',
 urlToCache = [
               './',
               'css/bootstrap-theme.min.css',
@@ -83,7 +83,7 @@ self.addEventListener('activate', function(event) {
 
 
 self.addEventListener('fetch', function(event) {
-	  console.log('Handling fetch event for', event.request.url, event.request.referrer);
+	  //console.log('Handling fetch event for', event.request.url, event.request.referrer);
 	  
 	  event.respondWith(
 	  new Promise(function(resolve, reject) {
@@ -92,23 +92,23 @@ self.addEventListener('fetch', function(event) {
 			  //c'est une request rest
 			  //ou une tentative de recupere le local
 			  // fetch puis cache
-			  console.error('rest ou local :', absoluteUrl);
+			  //console.error('rest ou local :', absoluteUrl);
 			  resolve(fetch(event.request).then(function(response) {
-				  console.error('rest ou local fetch ok  :', absoluteUrl);
+				  //console.error('rest ou local fetch ok  :', absoluteUrl);
 				  // fetch ok, on met en cache
 				  caches.open(CURRENT_CACHE).then(function(cache) {
-		        		console.log('Put in cache' , absoluteUrl);
+		        		//console.log('Put in cache' , absoluteUrl);
 		        		cache.add(event.request, response);
 					});
 				  return response;
 			  }).catch(function(error) {
-				  console.error('rest ou local fetch ko  :', absoluteUrl);
+				  //console.error('rest ou local fetch ko  :', absoluteUrl);
 				  return caches.match(event.request).then(function(response) {
 					  if (response) {
-						  	console.error('rest ou local cache ok :', absoluteUrl);
+						  	//console.error('rest ou local cache ok :', absoluteUrl);
 					        return response;
 				      } else {
-				    	  console.error('rest ou local  failed:', error);
+				    	  //console.error('rest ou local  failed:', error);
 				    	  return Promise.reject(error);
 				      }
 				  })
@@ -118,15 +118,15 @@ self.addEventListener('fetch', function(event) {
 			  //cache puis fetch
 			  resolve(caches.match(event.request).then(function(response) {
 				  if (response) {
-					  console.error('Autre, cache ok :', absoluteUrl);
+					  //console.error('Autre, cache ok :', absoluteUrl);
 			        return response;
 			      }
 				  return fetch(event.request).then(function(response) {
-					  console.error('Autre, fetch ok :', absoluteUrl);
+					  //console.error('Autre, fetch ok :', absoluteUrl);
 					  return response;
 				  })
 			  }).catch(function(error) {
-			        console.error('Autre, failed:', error);
+			        //console.error('Autre, failed:', error);
 			        return Promise.reject(error);
 			  })
 			  );
@@ -157,6 +157,17 @@ self.addEventListener('message', function(event) {
 				client.postMessage(event.data);
 			})
 		});
+	}
+	if(event.data.command == 'resetCache') {
+		console.log('reset du cache!');
+  	  caches.open(CURRENT_CACHE).then(function(cache) {
+		  cache.keys().then(function(response) {
+		    response.forEach(function(element, index, array) {
+		    		cache.delete(element);
+		    });
+		  });
+		  return cache.addAll(urlToCache);
+		})
 	}
 	
 });

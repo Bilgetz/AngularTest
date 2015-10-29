@@ -1,5 +1,5 @@
-insert into category (id, name) values (1, 'Puce');
-insert into category (id, name) values (2, 'Indigo');
+insert into category (id, name, version) values (1, 'Puce', '2014-01-01');
+insert into category (id, name, version) values (2, 'Indigo', '2014-10-01');
 insert into category (id, name) values (3, 'Yellow');
 insert into category (id, name) values (4, 'Crimson');
 insert into category (id, name) values (5, 'Purple');

@@ -3,6 +3,7 @@ package com.example.entity;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Version;
 
 import lombok.Data;
 
@@ -41,5 +43,8 @@ public class Comment implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "idpost", nullable = false)
 	private Post post;
+
+	@Version
+	private Date version;
 
 }
