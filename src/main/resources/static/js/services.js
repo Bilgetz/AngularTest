@@ -132,11 +132,56 @@ function CommentFactory($http, $q, SpringDataRestAdapter) {
 	//var fact2 = angular.copy(factory);
 	return factory;
 }
+angularApp.factory('DbCategoryFactory', ['$q',DbCategoryFactory ]);
+function DbCategoryFactory($q) {
+	var factory = {
+			db: null,
+			find : function(page, limit, criterias) {
+				var deferred = $q.defer();
+				var transaction = factory.db.transaction('categories', 'readonly');
+				var objectStore = transaction.objectStore('categories');
+				var categories = [];
+				
+				objectStore.openCursor().onsuccess = function(event) {
+					  var cursor = event.target.result;
+					  if (cursor) {
+						  categories.push(cursor.value);
+					    cursor.continue();
+					  }
+					  else {
+						  page = {size: 20,
+								  totalElements : categories.length,
+								  totalPages:1,
+								  number:0};
+						  deferred.resolve({
+								categories : categories,
+								page : page
+							});
+					  }
+					};
+				
+				return deferred.promise;
+			},
+			isAvaible: function() {
+				return (factory.db != null);
+			}
+	}
+	
+	if(window.indexedDB != undefined) {
+		var request = window.indexedDB.open("AngularTestDatabase", 1);
+		request.onerror = function(event) {
+			 console.log('error on database', request.errorCode);
+		};
+		request.onsuccess = function(event) {
+			factory.db = event.target.result;
+		};
+	}
+	
+	return factory;
+}
 
-
-angularApp.factory('CategoryFactory', ['$http','$q','SpringDataRestAdapter' ,CategoryFactory ]);
-
-function CategoryFactory($http, $q, SpringDataRestAdapter) {
+angularApp.factory('RestCategoryFactory', ['$http','$q','SpringDataRestAdapter' ,RestCategoryFactory ]);
+function RestCategoryFactory($http, $q, SpringDataRestAdapter) {
 	var factory = {
 			find : function(page, limit, criterias) {
 				var deferred = $q.defer();
@@ -152,6 +197,21 @@ function CategoryFactory($http, $q, SpringDataRestAdapter) {
 				});
 				
 				return deferred.promise;
+			}
+	}
+	return factory;
+}
+
+angularApp.factory('CategoryFactory', ['DbCategoryFactory','RestCategoryFactory' ,CategoryFactory ]);
+function CategoryFactory(DbCategoryFactory, RestCategoryFactory) {
+	var factory = {
+			find : function(page, limit, criterias) {
+				if(DbCategoryFactory.isAvaible()) {
+					return DbCategoryFactory.find(page, limit, criterias);
+				} else {
+					return RestCategoryFactory.find(page, limit, criterias);
+				}
+
 			}
 	}
 	return factory;

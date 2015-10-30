@@ -7,7 +7,7 @@ insert into category (id, name) values (6, 'Pink');
 insert into category (id, name) values (7, 'Purple');
 insert into category (id, name) values (8, 'Teal');
 insert into category (id, name) values (9, 'Mauv');
-insert into category (id, name) values (10, 'Blue');
+insert into category (id, name, version ) values (10, 'Blue', '2014-10-01');
 
 insert into post (id, name, content, note, idcategory, state) values (1, 'Shirley', 'sapien urna pretium nisl ut volutpat sapien arcu sed augue aliquam erat volutpat in congue', 3, 7,'VALID');
 insert into post (id, name, content, note, idcategory, state) values (2, 'Annie', 'morbi vestibulum velit id pretium iaculis diam erat fermentum justo nec condimentum neque sapien', 20, 6,'OBSOLETE');

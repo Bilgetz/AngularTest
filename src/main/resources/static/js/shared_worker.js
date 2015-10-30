@@ -3,12 +3,12 @@
  * rendant le timeout plus apelle des qu'il est interompue.
  * 
  */
-var clients = [],db ,request;
+var clients = [],db ,request, dataStores = [];
 
 /** reation de la db*/
 request = self.indexedDB.open("AngularTestDatabase", 1);
 request.onerror = function(event) {
- console.log('error on database', event.target.errorCode);
+ console.log('error on database', request.errorCode);
 };
 request.onsuccess = function(event) {
   db = event.target.result;
@@ -28,10 +28,12 @@ request.onupgradeneeded = function(event) {
 		  
 		  var cat = db.createObjectStore("categories", { keyPath: "id" });
 		  objectStore.put({name : 'categories', date : '2010/01/01 00:00:01 UTC'});
+		  cat.createIndex("self", "_links.self.href", { unique: false });
 		  
 		  var posts = db.createObjectStore("posts", { keyPath: "id" });
 		  posts.createIndex("name", "name", { unique: false });
 		  objectStore.put({name : 'posts', date : '2010/01/01 00:00:01 UTC'});
+		  
 	  }
 };
 /** fin creation db**/
@@ -39,7 +41,7 @@ request.onupgradeneeded = function(event) {
 
 function updateDb() {
 	console.log('shared worker updateDb');
-				
+
 /** met a jour les donnees **/		
 	function updateData(data, dataStore) {
 		return new Promise(function(resolve, reject) {
@@ -52,8 +54,8 @@ function updateDb() {
 					console.log('insert datas for', dataStore, nbModif);
 					for (var j = 0, k=data._embedded[dataStore].length; j < k; j++) {
 						//console.log('insert ', JSON.stringify(data._embedded[dataStore][j]));
-						
-						objectStore.put(data._embedded[dataStore][j]);
+						var finalObject = data._embedded[dataStore][j];
+						objectStore.put(finalObject);
 					}
 					objectStore = transaction.objectStore("lastChange");
 					var today = new Date();
@@ -74,25 +76,27 @@ function updateDb() {
 		/** recupere les donnes sur le reseau et met a jour**/
 		function fecthAndUpdateData(datastore) {
 			return new Promise(function(resolve, reject) {
-				var transaction = db.transaction(["lastChange", datastore], "readonly");
+				var transaction = db.transaction(["lastChange", datastore.store], "readonly");
 				//on recupere  le storage des lastChange
 				var objectStore = transaction.objectStore("lastChange");
 				// on recupe l'entre correspondant a ce qu'on veut aller chercher
-				var lastChange = objectStore.get(datastore);
+				var lastChange = objectStore.get(datastore.store);
 				var nbChange = 0;
 				lastChange.onsuccess = function(event) {
 					var lastDateChange = event.target.result.date;
-					var url = '/demo/rest/' + datastore + '/search/findByVersionIsAfter?date=' +lastDateChange;
+					var url = '/demo/rest/' + datastore.store + '/search/findByVersionIsAfter?date=' +lastDateChange;
+					if(datastore.projection != undefined && datastore.projection != '') {
+						url = url + '&projection=' + datastore.projection;
+					}
 					
 					console.log('fetching url :', url)
 					fetch(url).then(function(response) {
 							response.json().then(function(data) {
-							resolve(updateData(data,datastore));
+							resolve(updateData(data,datastore.store));
 						});//response.json().then
 					}).catch(function(error) {
 						reject('fetch error:',error);
 					});
-					
 				}
 				lastChange.onerror = function(error) {
 					reject('error get :',error);
@@ -103,8 +107,8 @@ function updateDb() {
 		/** retourne une promise qui sera ok quand la liste du datastore dera finie **/
 		function chainDataStore(dataStores) {
 			return new Promise(function(resolve, reject) {
-				var datastore =dataStores.pop();
-				console.log('shared worker Promise for ', dataStores);
+				var datastore =dataStores.shift();
+				console.log('shared worker Promise for ', datastore.store);
 				
 				fecthAndUpdateData(datastore).then(function(result) {
 					console.log(result);
@@ -121,12 +125,15 @@ function updateDb() {
 			});
 		}
 		
-		var dataStores = ['categories','posts'];
-		chainDataStore(dataStores).then(function() {
-			console.log('Update finish without trouble');
-		}).catch(function(error) {
-			console.log('error on update', error);
-		});
+		// d'abord les referentiels, ensuite les donnéee
+		if(dataStores.length ===0 ) {
+			dataStores = [{store: 'categories', projection:''},{store: 'posts', projection:'withCategoryId'}];
+			chainDataStore(dataStores).then(function() {
+				console.log('Update finish without trouble');
+			}).catch(function(error) {
+				console.log('error on update', error);
+			});
+		}
 		
 }
 
