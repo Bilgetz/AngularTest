@@ -2,45 +2,144 @@
  * 
  */
 
-angularApp.factory('PostFactory', ['$http','$q','SpringDataRestAdapter' ,PostFactory ]);
+var AngularTestDataBaseVersion = 1;
 
-function PostFactory($http, $q, SpringDataRestAdapter) {
+
+angularApp.factory('DbPostFactory', ['$q',DbPostFactory ]);
+
+function DbPostFactory($q) {
+	var factory = {
+			db : null,
+			find : function(page, limit, criterias,subToLoad) {
+				var deferred = $q.defer();
+				
+				var transaction = factory.db.transaction('posts', 'readonly');
+				var objectStore = transaction.objectStore('posts');
+				var posts = [];
+				var index= [];
+				var indexValue= [];
+				var filterOption = {
+						state : '',
+						note: '',
+						category: '',
+						name: '',
+						content:''
+				};
+				for ( var i=0, l = criterias.length; i<l  ;i++) {
+						filterOption[criterias[i].field.id] = criterias[i].value;
+				}
+
+				if(filterOption.state != '' && filterOption.category != '' ) {
+					var myIndex = objectStore.index('stateAndCategorie');
+					myIndex.openCursor(IDBKeyRange.only([filterOption.state.id,filterOption.category.id])).onsuccess = onsucessResult
+				} else if(filterOption.state != ''){
+					var myIndex = objectStore.index('state');
+					myIndex.openCursor(IDBKeyRange.only(filterOption.state.id)).onsuccess = onsucessResult
+				} else if(filterOption.category != '' ){
+					var myIndex = objectStore.index('idCategory');
+					myIndex.openCursor(IDBKeyRange.only(filterOption.category.id)).onsuccess = onsucessResult
+				} else {
+					objectStore.openCursor().onsuccess = onsucessResult;
+				}
+				
+					function onsucessResult(event) {
+					  var cursor = event.target.result;
+					  if (cursor) {
+						  // TODO do filter for note, name, content
+						  posts.push(cursor.value);
+						  cursor.continue();
+					  }
+					  else {
+						  var count = posts.length;
+						  var pageJson = {size: limit,
+								  totalElements : count,
+								  totalPages: (count/limit),
+								  number:page};
+						  var finalPosts = posts.slice((page-1)*limit, page*limit);
+						  // TODO recup category
+						  deferred.resolve({
+							  posts : finalPosts,
+								page : pageJson
+							});
+					  }
+					};
+				
+				return deferred.promise;
+			},
+			isAvaible: function() {
+				return (factory.db != null);
+			},
+			init: function() {
+				if(window.indexedDB != undefined) {
+					var request = window.indexedDB.open("AngularTestDatabase", AngularTestDataBaseVersion);
+					request.onerror = function(event) {
+						 console.log('error on database', request.errorCode);
+					};
+					request.onsuccess = function(event) {
+						factory.db = event.target.result;
+					};
+				}
+			}
+	}
+	
+	return factory;
+}
+
+
+angularApp.factory('RestPostFactory', ['$http','$q','SpringDataRestAdapter' ,RestPostFactory ]);
+
+function RestPostFactory($http, $q, SpringDataRestAdapter) {
+	var factory = {
+			find : function(page, limit, criterias,subToLoad) {
+				var deferred = $q.defer();
+				var search='';
+				for (var i = 0, l = criterias.length; i < l; i++) {
+					search+= criterias[i].field.id + criterias[i].operation.id + criterias[i].value.id + ',' 
+				}
+				var url = 'rest/posts/search/findByCriteria?page='+ (page -1) + '&size=' +limit;
+				if(criterias.length > 0 ) {
+					url += '&search=' + search;
+				}
+				
+				var httpPromise = $http.get(url);
+				SpringDataRestAdapter.process(httpPromise, subToLoad).then(function (processedResponse) {
+					var posts = processedResponse._embeddedItems != undefined ? processedResponse._embeddedItems : [];
+					processedResponse.page.number++;
+					for (var i = 0, l=posts.length; i < l; i++) {
+						if(posts[i].comments != undefined && posts[i].comments._embeddedItems != undefined) {
+							posts[i].comments = posts[i].comments._embeddedItems ;
+						}
+						if(posts[i].category != undefined && posts[i].category._embeddedItems != undefined) {
+							posts[i].category = posts[i].category._embeddedItems ;
+						}
+					}
+					factory.posts = posts;
+					deferred.resolve({
+						posts :processedResponse._embeddedItems,
+						page : processedResponse.page
+					});
+		        },function(response, status) {
+		        	var responseText = response != undefined ? response.statusText : 'no response';
+					deferred.reject('error on loading' + responseText);
+				});
+				
+				return deferred.promise;
+			}
+	}
+	return factory;
+}
+
+angularApp.factory('PostFactory', ['DbPostFactory','RestPostFactory' ,PostFactory ]);
+
+function PostFactory(DbPostFactory, RestPostFactory) {
 	var factory = {
 		posts : false,
 		find : function(page, limit, criterias,subToLoad) {
-			var deferred = $q.defer();
-			var search='';
-			for (var i = 0, l = criterias.length; i < l; i++) {
-				search+= criterias[i].field.id + criterias[i].operation.id + criterias[i].value.id + ',' 
+			if(DbPostFactory.isAvaible()) {
+				return DbPostFactory.find(page, limit, criterias);
+			} else {
+				return RestPostFactory.find(page, limit, criterias);
 			}
-			var url = 'rest/posts/search/findByCriteria?page='+ (page -1) + '&size=' +limit;
-			if(criterias.length > 0 ) {
-				url += '&search=' + search;
-			}
-			
-			var httpPromise = $http.get(url);
-			SpringDataRestAdapter.process(httpPromise, subToLoad).then(function (processedResponse) {
-				var posts = processedResponse._embeddedItems != undefined ? processedResponse._embeddedItems : [];
-				processedResponse.page.number++;
-				for (var i = 0, l=posts.length; i < l; i++) {
-					if(posts[i].comments != undefined && posts[i].comments._embeddedItems != undefined) {
-						posts[i].comments = posts[i].comments._embeddedItems ;
-					}
-					if(posts[i].category != undefined && posts[i].category._embeddedItems != undefined) {
-						posts[i].category = posts[i].category._embeddedItems ;
-					}
-				}
-				factory.posts = posts;
-				deferred.resolve({
-					posts :processedResponse._embeddedItems,
-					page : processedResponse.page
-				});
-	        },function(response, status) {
-	        	var responseText = response != undefined ? response.statusText : 'no response';
-				deferred.reject('error on loading' + responseText);
-			});
-			
-			return deferred.promise;
 		},
 		get : function(id, subToLoad) {
 			var deferred = $q.defer();
@@ -164,17 +263,18 @@ function DbCategoryFactory($q) {
 			},
 			isAvaible: function() {
 				return (factory.db != null);
+			},
+			init : function() {
+				if(window.indexedDB != undefined) {
+					var request = window.indexedDB.open("AngularTestDatabase", AngularTestDataBaseVersion);
+					request.onerror = function(event) {
+						 console.log('error on database', request.errorCode);
+					};
+					request.onsuccess = function(event) {
+						factory.db = event.target.result;
+					};
+				}
 			}
-	}
-	
-	if(window.indexedDB != undefined) {
-		var request = window.indexedDB.open("AngularTestDatabase", 1);
-		request.onerror = function(event) {
-			 console.log('error on database', request.errorCode);
-		};
-		request.onsuccess = function(event) {
-			factory.db = event.target.result;
-		};
 	}
 	
 	return factory;

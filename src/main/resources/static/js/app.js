@@ -30,7 +30,8 @@ if('serviceWorker' in navigator) {
 
 
 var angularApp = angular.module('demoApp',['ngAnimate','ngRoute', 'ngResource','spring-data-rest','ui.bootstrap','ngSanitize','pascalprecht.translate', 'auth']); 
-angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth', function($rootScope, localeFactory,$translate,$auth) {
+angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth','DbCategoryFactory','DbPostFactory', 
+                function($rootScope, localeFactory,$translate,$auth, DbCategoryFactory,DbPostFactory) {
 	$rootScope.page = {};
 	$rootScope.alerts = [];
 	$rootScope.locales= [];
@@ -122,7 +123,12 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth', function($ro
 		var myWorker = new SharedWorker("js/shared_worker.js");
 		myWorker.port.start();
 		myWorker.port.onmessage = function(e) {
-			console.log('message from worker' + e.data);
+			if(e.data.command != undefined && e.data.command  == 'initOk') {
+				DbPostFactory.init();
+				DbCategoryFactory.init();
+			} else {
+				console.log('message from worker' + e.data);
+			}
 		}
 	}
 

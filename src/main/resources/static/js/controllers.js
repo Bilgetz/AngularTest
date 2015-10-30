@@ -12,7 +12,7 @@ function PostsCtrl($scope,$rootScope,  $PostFactory, $CategoryFactory) {
 	$scope.criteriaField = [{id: "name", value:"name of post", type: "text"},
 	                        {id: "content", value:"content of post", type: "text"},
 	                        {id: "note", value:"note of post", type: "number"},
-	                        {id: "etat", value:"etat of post", type: "entity"},
+	                        {id: "state", value:"etat of post", type: "entity"},
 	                        {id: "category", value:"category of post", type: "entity"}];
 	$scope.criteriaOperation = [{id: ":", value:"="}, {id: "<", value:"inf"}, {id: ">", value:"sup"}];
 	$scope.subResources = { category : [] , etat: []}
@@ -23,7 +23,7 @@ function PostsCtrl($scope,$rootScope,  $PostFactory, $CategoryFactory) {
 		alert(msg);
 	});
 	
-	$scope.subResources.etat = [{id:'VALID', name: 'VALID'}, {id:'OBSOLETE', name: 'OBSOLETE'}];
+	$scope.subResources.state = [{id:'VALID', name: 'VALID'}, {id:'OBSOLETE', name: 'OBSOLETE'}];
 	
 	
 	$scope.pageChanged = function() {

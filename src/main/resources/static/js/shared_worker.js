@@ -12,6 +12,11 @@ request.onerror = function(event) {
 };
 request.onsuccess = function(event) {
   db = event.target.result;
+  console.log('sucess log DB: ');
+  
+  for (var i = 0; i < clients.length; i++) {
+	  clients[i].postMessage({command :'initOk'});
+  }
   
   updateDb();
   //refresh tt les 10 mins
@@ -28,11 +33,18 @@ request.onupgradeneeded = function(event) {
 		  
 		  var cat = db.createObjectStore("categories", { keyPath: "id" });
 		  objectStore.put({name : 'categories', date : '2010/01/01 00:00:01 UTC'});
-		  cat.createIndex("self", "_links.self.href", { unique: false });
 		  
 		  var posts = db.createObjectStore("posts", { keyPath: "id" });
-		  posts.createIndex("name", "name", { unique: false });
+		  posts.createIndex("state", "state", { unique: false });
+		  posts.createIndex("note", "note", { unique: false });
+		  posts.createIndex("idCategory", "idCategory", { unique: false });
+		  posts.createIndex("stateAndCategorie", ['state', 'idCategory'], { unique: false });
 		  objectStore.put({name : 'posts', date : '2010/01/01 00:00:01 UTC'});
+		  
+		  var comments = db.createObjectStore("comments", { keyPath: "id" });
+		  comments.createIndex("idPost", "idPost", { unique: false });
+		  objectStore.put({name : 'comments', date : '2010/01/01 00:00:01 UTC'});
+		  
 		  
 	  }
 };
@@ -126,8 +138,12 @@ function updateDb() {
 		}
 		
 		// d'abord les referentiels, ensuite les donnéee
-		if(dataStores.length ===0 ) {
-			dataStores = [{store: 'categories', projection:''},{store: 'posts', projection:'withCategoryId'}];
+		if(dataStores.length === 0 ) {
+			dataStores = [
+			              {store: 'categories', projection:''},
+			              {store: 'posts', projection:'withCategoryId'},
+			              {store: 'comments', projection:'withPostId'}
+			              ];
 			chainDataStore(dataStores).then(function() {
 				console.log('Update finish without trouble');
 			}).catch(function(error) {
