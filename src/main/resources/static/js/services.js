@@ -56,13 +56,60 @@ function DbPostFactory($q) {
 								  totalPages: (count/limit),
 								  number:page};
 						  var finalPosts = posts.slice((page-1)*limit, page*limit);
-						  // TODO recup category
-						  deferred.resolve({
-							  posts : finalPosts,
-								page : pageJson
-							});
+						  factory.getCategoryOfPosts(finalPosts).then(function(result) {
+							  deferred.resolve({
+								  posts : finalPosts,
+									page : pageJson
+								});
+						  }, function(error) {
+							  deferred.reject(error);
+						  });
+						  
+						  
 					  }
 					};
+				
+				return deferred.promise;
+			},
+			getCategoryOfPosts : function(posts) {
+				var i=-1;
+				var l = posts.length;
+				
+				if(l == 0) {
+					return 0;
+				}
+				
+				function resolvePost() {
+					i++;
+					if(i>=l) {
+						return i;
+					} else {
+						var deferred = $q.defer();
+						factory.getCategoryOfPost(posts[i]).then(function() {
+							deferred.resolve(resolvePost());
+						}, function(error) {
+							deferred.reject(error);
+						});
+						return deferred.promise;
+					}
+				};
+				
+				return resolvePost();
+			},
+			getCategoryOfPost : function(post) {
+				var deferred = $q.defer();
+				
+				var transaction = factory.db.transaction('categories', 'readonly');
+				var objectStore = transaction.objectStore('categories');
+				var getCategrory = objectStore.get(post.idCategory);
+				getCategrory.onsuccess = function(event) {
+					post.category = event.target.result;
+					deferred.resolve(post.category);
+				}
+				getCategrory.onerror = function(event) {
+					deferred.reject("error get category " + post.idCategory);
+				}
+				
 				
 				return deferred.promise;
 			},

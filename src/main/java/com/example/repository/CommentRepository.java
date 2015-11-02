@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.example.entity.Comment;
-import com.example.entity.Post;
 
 public interface CommentRepository extends PagingAndSortingRepository<Comment, Long> {
 
@@ -28,6 +27,6 @@ public interface CommentRepository extends PagingAndSortingRepository<Comment, L
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	void delete(Iterable<? extends Comment> entities);
 
-	List<Post> findByVersionIsAfter(@Param(value = "date") Date version);
+	List<Comment> findByVersionIsAfter(@Param(value = "date") Date version);
 
 }

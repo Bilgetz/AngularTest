@@ -48,6 +48,16 @@ request.onupgradeneeded = function(event) {
 		  
 	  }
 };
+
+request.onblocked = function(event) {
+  // If some other tab is loaded with the database, then it needs to be closed
+  // before we can proceed.
+	  for (var i = 0; i < clients.length; i++) {
+		  clients[i].postMessage({command :'message' , value:'All tabs need to be closed for apply update.'});
+	  }
+};
+
+
 /** fin creation db**/
 
 

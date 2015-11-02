@@ -126,6 +126,10 @@ angularApp.run(['$rootScope', 'LocaleFactory','$translate','$auth','DbCategoryFa
 			if(e.data.command != undefined && e.data.command  == 'initOk') {
 				DbPostFactory.init();
 				DbCategoryFactory.init();
+			} else if(e.data.command != undefined && e.data.command  == 'message') {
+				$rootScope.$apply(function() {
+					$rootScope.alerts.push(e.data.value);
+				});
 			} else {
 				console.log('message from worker' + e.data);
 			}
